@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnAnimation: {fileID: 7400000, guid: ffae3c132b5532943947a55c8b5dc694, type: 2}
-  monster: {fileID: 7581962548240843740, guid: db48c05ba4e9a5c4a9e3db342ecbda42, type: 3}
+  monster: {fileID: 7762213506918729004, guid: e0608c969d3a8bc46a0ca41aa778a13f, type: 3}
   spawnObject: {fileID: 9146544617073406351}
 --- !u!1 &9146544617073406351
 GameObject:

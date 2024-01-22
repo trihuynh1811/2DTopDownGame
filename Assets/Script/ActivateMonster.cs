@@ -5,7 +5,7 @@ using UnityEngine;
 public class ActivateMonster : MonoBehaviour
 {
     [SerializeField] AnimationClip spawnAnimation;
-    [SerializeField] GameObject monster;
+    public GameObject monster;
     [SerializeField] GameObject spawnObject;
 
     private void Awake()

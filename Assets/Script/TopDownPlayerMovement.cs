@@ -11,8 +11,12 @@ public class TopDownPlayerMovement : MonoBehaviour
     [SerializeField] LayerMask pickUpMask;
     [SerializeField] BoxCollider2D boxCollider;
 
-    [SerializeField] float health;
-    [SerializeField] Slider healthSlider;
+    public Slider healthSlider, armourSlider, energySlider;
+    public float health, armour, energy;
+    public float maxHealth, maxArmour, maxEnergy;
+
+    public Text healthText, armourText, energyText;
+
     [SerializeField] Transform gunPos;
     [SerializeField] Animator animator;
     [SerializeField] Rigidbody2D rb;
@@ -25,7 +29,21 @@ public class TopDownPlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        health = maxHealth;
+        armour = maxArmour;
+        energy = maxEnergy;
+
+        healthSlider.maxValue = maxHealth;
+        armourSlider.maxValue = maxArmour;
+        energySlider.maxValue = maxEnergy;
+
         healthSlider.value = health;
+        armourSlider.value = armour;
+        energySlider.value = energy;
+
+        healthText.text = $"{health} / {maxHealth}";
+        armourText.text = $"{armour} / {maxArmour}";
+        energyText.text = $"{energy} / {maxEnergy}";
     }
     private void Update()
     {

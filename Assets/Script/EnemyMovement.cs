@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class EnemyMovement : MonoBehaviour, ITakeDamage
 {
@@ -27,9 +28,15 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
     [SerializeField] Rigidbody2D rb;
     [SerializeField] LayerMask wallMask;
     [SerializeField] Vector2 rotation;
+    public Seeker seeker;
+    public float nextWayPointDistance;
+
+    Path path;
+    int currentWayPoint;
+    bool reachedEndOfPath;
 
     float initialYRotation = 180;
-    float distance;
+    float distanceToPlayer;
     float laserDistance;
     float currentMoveSpeed;
     Vector2 direction;
@@ -39,6 +46,25 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
     {
         player = GameObject.Find("Player");
         currentMoveSpeed = moveSpeed;
+
+        InvokeRepeating("UpdatePath", 0f, .5f);
+    }
+
+    void UpdatePath()
+    {
+        if (seeker.IsDone())
+        {
+            seeker.StartPath(rb.position, player.transform.position, OnPathComplete);
+        }
+    }
+
+    void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            path = p;
+            currentWayPoint = 0;
+        }
     }
 
     void Update()
@@ -90,17 +116,16 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
 
     void FollowPlayer()
     {
-        distance = Vector2.Distance(transform.position, player.transform.position);
-        direction = player.transform.position - transform.position;
+        distanceToPlayer = Vector2.Distance(rb.position, player.transform.position);
 
-        if (distance > followRange)
+        if (distanceToPlayer > followRange)
         {
             currentMoveSpeed = 0;
             animator.Play(idleAnimation.name);
         }
         else
         {
-            if (distance <= attackRange)
+            if (distanceToPlayer <= attackRange)
             {
                 currentMoveSpeed = 0;
                 animator.Play(idleAnimation.name);
@@ -112,16 +137,25 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
             }
         }
 
-        // Calculate the direction from the enemy to the player
-        Vector3 directionToPlayer = player.transform.position - transform.position;
+        if (path == null)
+        {
+            return;
+        }
 
-        // Normalize the direction to get a unit vector
-        Vector3 normalizedDirection = directionToPlayer.normalized;
+        if (currentWayPoint >= path.vectorPath.Count)
+        {
+            reachedEndOfPath = true;
+            return;
+        }
+        else
+        {
+            reachedEndOfPath = false;
+        }
 
-        // Calculate the new position using Rigidbody2D.MovePosition
-        Vector2 targetPos = rb.position + (Vector2)normalizedDirection * currentMoveSpeed * Time.deltaTime;
-        rb.velocity = normalizedDirection * currentMoveSpeed;
-        rb.MovePosition(targetPos);
+        Vector2 direction = ((Vector2)path.vectorPath[currentWayPoint] - rb.position).normalized;
+        Vector2 force = currentMoveSpeed * Time.deltaTime * direction;
+
+        rb.AddForce(force);
 
         Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, avoidanceRadius);
 
@@ -131,11 +165,20 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
             {
                 // Calculate the avoidance direction and adjust the movement
                 Vector2 avoidDirection = (rb.position - (Vector2)collider.transform.position).normalized;
-                Vector2 avoidPosition = rb.position + avoidDirection * currentMoveSpeed * Time.deltaTime;
-                rb.velocity = avoidDirection * currentMoveSpeed;
-                rb.MovePosition(avoidPosition);
+                Vector2 forceToAvoid = avoidDirection * avoidanceForce;
+
+                // Apply the avoidance force using Rigidbody2D.AddForce
+                rb.AddForce(forceToAvoid);
             }
         }
+
+        float distance = Vector2.Distance(rb.position, path.vectorPath[currentWayPoint]);
+
+        if (distance < nextWayPointDistance)
+        {
+            currentWayPoint++;
+        }
+
     }
 
 
@@ -154,7 +197,7 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
         {
             if (hit.collider.CompareTag("Ground/Wall"))
             {
-                distance = ((Vector2)hit.point - (Vector2)laserPoint.position).magnitude;
+                distanceToPlayer = ((Vector2)hit.point - (Vector2)laserPoint.position).magnitude;
             }
             if (hit.collider.CompareTag("Player"))
             {
@@ -163,9 +206,9 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
         }
         else
         {
-            distance = lineLength;
+            distanceToPlayer = lineLength;
         }
-        line.SetPosition(1, new Vector2(distance, 0));
+        line.SetPosition(1, new Vector2(distanceToPlayer, 0));
 
     }
     private void OnDrawGizmos()
@@ -182,23 +225,6 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
             rotation.y -= initialYRotation;
             FlipEnemyFacing();
         }
-    }
-
-    bool IsColliding(Collider2D[] colliders)
-    {
-        return colliders.Length > 0;
-    }
-
-    Collider2D[] GetOverlappingColliders()
-    {
-        // Assuming your object has a Collider2D component
-        Collider2D collider = GetComponent<Collider2D>();
-
-        // Use OverlapCollider method to get overlapping colliders
-        Collider2D[] overlappingColliders = new Collider2D[1];
-        Physics2D.OverlapCollider(collider, new ContactFilter2D(), overlappingColliders);
-
-        return overlappingColliders;
     }
 
     public void TakeDamage(float dmg)

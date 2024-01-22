@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FlamthorwerGunMat
-  m_Shader: {fileID: -6465566751694194690, guid: b41c32add60a3ed408f2db7092c906e8, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 47f01fbd09c501641a0443d8b67b5c64, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -40,12 +40,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Emission:
+        m_Texture: {fileID: 2800000, guid: 8c8c1b6b4e6b7d84bb474493d4df3ea1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _EmissionMass:
         m_Texture: {fileID: 2800000, guid: 8c8c1b6b4e6b7d84bb474493d4df3ea1, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 8c8c1b6b4e6b7d84bb474493d4df3ea1, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7d86c157bb3a6764ea0c60820e016d3f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainText:
@@ -77,6 +81,7 @@ Material:
     - Vector1_D735DD78: 0.75
     - _EnableExternalAlpha: 0
     m_Colors:
+    - Color_9B862B2B: {r: 5.9921575, g: 0, b: 0, a: 1}
     - Color_D21B6B67: {r: 32, g: 0.18112946, b: 0.18112946, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
