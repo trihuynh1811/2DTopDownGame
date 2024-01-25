@@ -11,9 +11,10 @@ public class TopDownPlayerMovement : MonoBehaviour
     [SerializeField] LayerMask pickUpMask;
     [SerializeField] BoxCollider2D boxCollider;
 
-    public Slider healthSlider, armourSlider, energySlider;
-    public float health, armour, energy;
-    public float maxHealth, maxArmour, maxEnergy;
+    [SerializeField] Slider healthSlider, armourSlider, energySlider;
+    [SerializeField] float health, armour, energy;
+    [SerializeField] float maxHealth, maxArmour, maxEnergy;
+    [SerializeField] float regenerateArmourRate, regenerateEnegeyRate;
 
     public Text healthText, armourText, energyText;
 
@@ -25,6 +26,7 @@ public class TopDownPlayerMovement : MonoBehaviour
     bool m_FacingRight = true;
     float moveX, moveY;
     Collider2D collider_;
+    float energyDeductionRate;
     // Start is called before the first frame update
 
     private void Start()
@@ -44,6 +46,9 @@ public class TopDownPlayerMovement : MonoBehaviour
         healthText.text = $"{health} / {maxHealth}";
         armourText.text = $"{armour} / {maxArmour}";
         energyText.text = $"{energy} / {maxEnergy}";
+
+        InvokeRepeating("RegenerateArmor", 0f, regenerateArmourRate);
+        InvokeRepeating("RegenerateEnergy", 0f, regenerateEnegeyRate);
     }
     private void Update()
     {
@@ -59,6 +64,11 @@ public class TopDownPlayerMovement : MonoBehaviour
         }
         GetInput();
         RotateGun();
+        if(energyDeductionRate <= 0)
+        {
+            ConsumeEnergy();
+        }
+        if (energyDeductionRate > 0) energyDeductionRate -= Time.deltaTime;
         collider_ = Physics2D.OverlapCircle(transform.position, 3f, pickUpMask);
         if (collider_)
         {
@@ -122,10 +132,82 @@ public class TopDownPlayerMovement : MonoBehaviour
 
     }
 
-    public void TakeDamage()
+    public void TakeDamage(int dmg)
     {
-        health -= 10;
+        armour -= dmg;
+        if (armour <= 0)
+        {
+            armour = 0;
+            health -= dmg;
+            if (health <= 0)
+            {
+                health = 0;
+            }
+        }
+        UpdateUi();
+
+    }
+
+    void RegenerateArmor()
+    {
+        if (armour < maxArmour)
+        {
+            armour++;
+            UpdateUi();
+        }
+
+    }
+
+    void RegenerateEnergy()
+    {
+        if (energy < maxEnergy)
+        {
+            energy++;
+            UpdateUi();
+        }
+    }
+
+    public void ConsumeEnergy()
+    {
+        if (pickUp.GetCurrentWeapon() == null)
+        {
+            return;
+        }
+
+        if (pickUp.GetCurrentWeapon().GetComponent<Gun>().GetCurrentFireRate() <= 0 && Input.GetButton("Fire1"))
+        {
+            switch (pickUp.GetCurrentWeapon().GetComponent<Gun>().gunType)
+            {
+                case Gun.GunType.NormalGun:
+                    energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
+                    energyDeductionRate = 0;
+                    UpdateUi();
+                    break;
+                case Gun.GunType.LaserGun:
+                    energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
+                    energyDeductionRate = pickUp.GetCurrentWeapon().GetComponent<Gun>().GetFireRate();
+                    UpdateUi();
+                    break;
+                case Gun.GunType.Flamethrower:
+                    energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
+                    energyDeductionRate = pickUp.GetCurrentWeapon().GetComponent<Gun>().GetFireRate();
+                    UpdateUi();
+                    break;
+
+            }
+
+        }
+    }
+
+    void UpdateUi()
+    {
         healthSlider.value = health;
+        armourSlider.value = armour;
+        energySlider.value = energy;
+
+        healthText.text = $"{health} / {maxHealth}";
+        armourText.text = $"{armour} / {maxArmour}";
+        energyText.text = $"{energy} / {maxEnergy}";
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

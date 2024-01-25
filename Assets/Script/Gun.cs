@@ -18,11 +18,13 @@ public class Gun : MonoBehaviour
     [SerializeField] LineRenderer laser;
     [SerializeField] GameObject laserStart, laserEnd;
 
-    [SerializeField] LayerMask hitableLayerMask;
+    [SerializeField] LayerMask hitEnemyLayerMask;
+    [SerializeField] LayerMask hitObjectLayerMask;
     [SerializeField] float rayCastLength;
 
     [SerializeField] float damage;
-    [SerializeField] SpriteRenderer gunSprite;
+    public int energyConsume;
+    public SpriteRenderer gunSprite;
     [SerializeField] Transform firePoint;
     [SerializeField] GameObject bullet;
     [SerializeField] float maxBulletSpeed;
@@ -35,7 +37,8 @@ public class Gun : MonoBehaviour
     float currentBulletSpeed;
     float currentRayCastLength;
     float distance;
-    RaycastHit2D hit;
+    RaycastHit2D hitEnemy;
+    RaycastHit2D hitObject;
     // Start is called before the first frame update
     private void Awake()
     {
@@ -94,6 +97,7 @@ public class Gun : MonoBehaviour
                         flameParticle[i].Stop();
                     }
                 }
+                if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
             case GunType.LaserGun:
                 if (Input.GetButton("Fire1"))
@@ -106,6 +110,7 @@ public class Gun : MonoBehaviour
                     laserEnd.SetActive(false);
                     laser.SetPosition(1, Vector3.zero);
                 }
+                if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
         }
 
@@ -133,14 +138,11 @@ public class Gun : MonoBehaviour
                 {
                     flameParticle[i].Play();
                 }
-                hit = Physics2D.Raycast(firePoint.position, firePoint.right, currentRayCastLength, hitableLayerMask);
-                if (hit)
+                hitEnemy = Physics2D.Raycast(firePoint.position, firePoint.right, currentRayCastLength, hitEnemyLayerMask);
+                if (hitEnemy && currentFireRate <= 0)
                 {
-                    currentRayCastLength = hit.distance;
-                    if (hit.collider.CompareTag("Enemy"))
-                    {
-                        hit.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
-                    }
+                    hitEnemy.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
+                    currentFireRate = fireRate;
                 }
                 else
                 {
@@ -149,16 +151,18 @@ public class Gun : MonoBehaviour
                 break;
             case GunType.LaserGun:
                 laserStart.SetActive(true);
-                hit = Physics2D.Raycast(firePoint.position, firePoint.right, rayCastLength, hitableLayerMask);
-                if (hit)
+                hitEnemy = Physics2D.Raycast(firePoint.position, firePoint.right, rayCastLength, hitEnemyLayerMask);
+                hitObject = Physics2D.Raycast(firePoint.position, firePoint.right, rayCastLength, hitObjectLayerMask);
+                if (hitEnemy && currentFireRate <= 0)
                 {
-                    distance = ((Vector2)hit.point - (Vector2)firePoint.position).magnitude;
-                    laserEnd.transform.position = hit.point;
+                    hitEnemy.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
+                    currentFireRate = fireRate;
+                }
+                if (hitObject)
+                {
+                    distance = ((Vector2)hitObject.point - (Vector2)firePoint.position).magnitude;
+                    laserEnd.transform.position = hitObject.point;
                     laserEnd.SetActive(true);
-                    if (hit.collider.CompareTag("Enemy"))
-                    {
-                        hit.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
-                    }
                 }
                 else
                 {
@@ -170,6 +174,21 @@ public class Gun : MonoBehaviour
         }
 
 
+    }
+
+    public float GetCurrentFireRate()
+    {
+        return currentFireRate;
+    }
+
+    public void ResetCurrentFireRate()
+    {
+        currentFireRate = 0;
+    }
+
+    public float GetFireRate()
+    {
+        return fireRate;
     }
 
     private void OnDrawGizmos()

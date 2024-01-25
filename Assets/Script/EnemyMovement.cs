@@ -201,7 +201,7 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
             }
             if (hit.collider.CompareTag("Player"))
             {
-                hit.collider.gameObject.GetComponentInParent<TopDownPlayerMovement>().TakeDamage();
+                hit.collider.gameObject.GetComponentInParent<TopDownPlayerMovement>().TakeDamage(30);
             }
         }
         else

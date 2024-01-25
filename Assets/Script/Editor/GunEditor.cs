@@ -12,10 +12,12 @@ public class GunEditor : Editor
 
     SerializedProperty flameParticle;
 
-    SerializedProperty hitableLayerMask;
+    SerializedProperty hitEnemyLayerMask;
+    SerializedProperty hitObjectLayerMask;
     SerializedProperty rayCastLength;
 
     SerializedProperty damage;
+    SerializedProperty energyConsume;
     SerializedProperty gunSprite;
     SerializedProperty firePoint;
     SerializedProperty bullet;
@@ -35,10 +37,12 @@ public class GunEditor : Editor
 
         flameParticle = serializedObject.FindProperty("flameParticle");
 
-        hitableLayerMask = serializedObject.FindProperty("hitableLayerMask");
+        hitEnemyLayerMask = serializedObject.FindProperty("hitEnemyLayerMask");
+        hitObjectLayerMask = serializedObject.FindProperty("hitObjectLayerMask");
         rayCastLength = serializedObject.FindProperty("rayCastLength");
 
         damage = serializedObject.FindProperty("damage");
+        energyConsume = serializedObject.FindProperty("energyConsume");
         gunSprite = serializedObject.FindProperty("gunSprite");
         firePoint = serializedObject.FindProperty("firePoint");
         bullet = serializedObject.FindProperty("bullet");
@@ -79,8 +83,10 @@ public class GunEditor : Editor
     public void displayGeneralSetting()
     {
         EditorGUILayout.PropertyField(damage);
+        EditorGUILayout.PropertyField(energyConsume);
         EditorGUILayout.PropertyField(gunSprite);
         EditorGUILayout.PropertyField(firePoint);
+        EditorGUILayout.PropertyField(fireRate);
     }
 
     public void displaySettingForNormalGun()
@@ -88,7 +94,6 @@ public class GunEditor : Editor
         EditorGUILayout.PropertyField(bullet);
         EditorGUILayout.PropertyField(maxBulletSpeed);
         EditorGUILayout.PropertyField(minBulletSpeed);
-        EditorGUILayout.PropertyField(fireRate);
         EditorGUILayout.PropertyField(spreadAngle);
         EditorGUILayout.PropertyField(numberOfBullet);
     }
@@ -96,7 +101,7 @@ public class GunEditor : Editor
     public void displaySettingForFlameThrower()
     {
         EditorGUILayout.PropertyField(flameParticle);
-        EditorGUILayout.PropertyField(hitableLayerMask);
+        EditorGUILayout.PropertyField(hitEnemyLayerMask);
         EditorGUILayout.PropertyField(rayCastLength);
     }
 
@@ -104,7 +109,8 @@ public class GunEditor : Editor
     public void displaySettingForLaser()
     {
         EditorGUILayout.PropertyField(laser);
-        EditorGUILayout.PropertyField(hitableLayerMask);
+        EditorGUILayout.PropertyField(hitEnemyLayerMask);
+        EditorGUILayout.PropertyField(hitObjectLayerMask);
         EditorGUILayout.PropertyField(rayCastLength);
         EditorGUILayout.PropertyField(laserStart);
         EditorGUILayout.PropertyField(laserEnd);

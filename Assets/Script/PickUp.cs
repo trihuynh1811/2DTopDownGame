@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PickUp : MonoBehaviour
 {
@@ -9,16 +10,18 @@ public class PickUp : MonoBehaviour
     public List<GameObject> weaponList;
     [SerializeField] int maxWeaponCanHold;
     [SerializeField] GameObject currentWeapon;
+    [SerializeField] Image gunImgBg, gunImg;
+    [SerializeField] Text energyText;
     public int next = -1;
 
     private void Awake()
     {
-       
+        gunImgBg.gameObject.SetActive(false);
     }
 
     public void PickUpWeapon(GameObject weapon)
     {
-        if(weaponList.Count >= maxWeaponCanHold)
+        if (weaponList.Count >= maxWeaponCanHold)
         {
             DropWeapon();
         }
@@ -34,14 +37,17 @@ public class PickUp : MonoBehaviour
         {
             currentWeapon = weapon;
             next = 0;
+            gunImg.sprite = currentWeapon.GetComponent<Gun>().gunSprite.sprite;
+            energyText.text = currentWeapon.GetComponent<Gun>().energyConsume.ToString();
             weapon.SetActive(true);
+            gunImgBg.gameObject.SetActive(true);
         }
 
     }
 
     public void DropWeapon()
     {
-        if(currentWeapon == null)
+        if (currentWeapon == null)
         {
             return;
         }
@@ -65,11 +71,17 @@ public class PickUp : MonoBehaviour
 
     public void SwitchWeapon()
     {
-        if (weaponList.Count <= 0) return;
+        if (weaponList.Count <= 0)
+        {
+            gunImgBg.gameObject.SetActive(false);
+            return;
+        }
         if (currentWeapon == null)
         {
             currentWeapon = weaponList[0];
             next = 0;
+            gunImg.sprite = currentWeapon.GetComponent<Gun>().gunSprite.sprite;
+            energyText.text = currentWeapon.GetComponent<Gun>().energyConsume.ToString();
             currentWeapon.SetActive(true);
             return;
         }
@@ -85,7 +97,10 @@ public class PickUp : MonoBehaviour
         if (next == -1) next = 0;
         next %= weaponList.Count;
         currentWeapon.SetActive(false);
+        currentWeapon.GetComponent<Gun>().ResetCurrentFireRate();
         currentWeapon = weaponList[next];
+        gunImg.sprite = currentWeapon.GetComponent<Gun>().gunSprite.sprite;
+        energyText.text = currentWeapon.GetComponent<Gun>().energyConsume.ToString();
         currentWeapon.SetActive(true);
 
     }
