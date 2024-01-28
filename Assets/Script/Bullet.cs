@@ -8,6 +8,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] int maxBounceTime;
     [SerializeField] float maxExistTime;
     [SerializeField] bool canBounce;
+    int damage;
     Vector3 lastVelocity;
     int currentBounceTime;
 
@@ -64,6 +65,10 @@ public class Bullet : MonoBehaviour
         }
     }
 
+    public void SetDmg(int dmg)
+    {
+        damage = dmg;
+    }
 
     IEnumerator DestroyAfter()
     {

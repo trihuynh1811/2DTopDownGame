@@ -9,12 +9,15 @@ public class TopDownPlayerMovement : MonoBehaviour
     [SerializeField] Vector3 offset;
     [SerializeField] PickUp pickUp;
     [SerializeField] LayerMask pickUpMask;
+    [SerializeField] float pickUpRadius;
     [SerializeField] BoxCollider2D boxCollider;
 
     [SerializeField] Slider healthSlider, armourSlider, energySlider;
     [SerializeField] float health, armour, energy;
     [SerializeField] float maxHealth, maxArmour, maxEnergy;
     [SerializeField] float regenerateArmourRate, regenerateEnegeyRate;
+    [SerializeField] GameObject weaponStatCanvas;
+    [SerializeField] Text weaponDmg, weaponRoF, weaponEnergyConsume, weaponCriticalHit, weaponAccuracy;
 
     public Text healthText, armourText, energyText;
 
@@ -47,6 +50,8 @@ public class TopDownPlayerMovement : MonoBehaviour
         armourText.text = $"{armour} / {maxArmour}";
         energyText.text = $"{energy} / {maxEnergy}";
 
+        weaponStatCanvas.SetActive(false);
+
         InvokeRepeating("RegenerateArmor", 0f, regenerateArmourRate);
         InvokeRepeating("RegenerateEnergy", 0f, regenerateEnegeyRate);
     }
@@ -69,13 +74,41 @@ public class TopDownPlayerMovement : MonoBehaviour
             ConsumeEnergy();
         }
         if (energyDeductionRate > 0) energyDeductionRate -= Time.deltaTime;
-        collider_ = Physics2D.OverlapCircle(transform.position, 3f, pickUpMask);
+        collider_ = Physics2D.OverlapCircle(transform.position, pickUpRadius, pickUpMask);
         if (collider_)
         {
-            if (Input.GetKeyDown(KeyCode.X))
+            if (collider_.gameObject.CompareTag("Weapon"))
             {
-                pickUp.PickUpWeapon(collider_.gameObject);
+                weaponDmg.text = collider_.gameObject.GetComponent<Gun>().Damage;
+                weaponRoF.text = collider_.gameObject.GetComponent<Gun>().FireRate;
+                weaponEnergyConsume.text = collider_.gameObject.GetComponent<Gun>().EnergyConsume;
+                weaponCriticalHit.text = collider_.gameObject.GetComponent<Gun>().CriticalHitChance;
+                weaponAccuracy.text = collider_.gameObject.GetComponent<Gun>().SpreadAngle;
+                weaponStatCanvas.SetActive(true);
+                if (Input.GetKeyDown(KeyCode.X))
+                {
+                    pickUp.PickUpWeapon(collider_.gameObject);
+                }
             }
+            else
+            {
+                weaponDmg.text = "";
+                weaponRoF.text = "";
+                weaponEnergyConsume.text = "";
+                weaponCriticalHit.text = "";
+                weaponAccuracy.text = "";
+                weaponStatCanvas.SetActive(false);
+            }
+
+        }
+        else
+        {
+            weaponDmg.text = "";
+            weaponRoF.text = "";
+            weaponEnergyConsume.text = "";
+            weaponCriticalHit.text = "";
+            weaponAccuracy.text = "";
+            weaponStatCanvas.SetActive(false);
         }
         if (Input.GetKeyDown(KeyCode.T))
         {
@@ -129,7 +162,8 @@ public class TopDownPlayerMovement : MonoBehaviour
 
     public void OnDrawGizmos()
     {
-
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(transform.position, pickUpRadius);
     }
 
     public void TakeDamage(int dmg)

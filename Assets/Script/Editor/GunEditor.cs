@@ -17,6 +17,7 @@ public class GunEditor : Editor
     SerializedProperty rayCastLength;
 
     SerializedProperty damage;
+    SerializedProperty criticalHitChance;
     SerializedProperty energyConsume;
     SerializedProperty gunSprite;
     SerializedProperty firePoint;
@@ -42,6 +43,7 @@ public class GunEditor : Editor
         rayCastLength = serializedObject.FindProperty("rayCastLength");
 
         damage = serializedObject.FindProperty("damage");
+        criticalHitChance = serializedObject.FindProperty("criticalHitChance");
         energyConsume = serializedObject.FindProperty("energyConsume");
         gunSprite = serializedObject.FindProperty("gunSprite");
         firePoint = serializedObject.FindProperty("firePoint");
@@ -83,6 +85,7 @@ public class GunEditor : Editor
     public void displayGeneralSetting()
     {
         EditorGUILayout.PropertyField(damage);
+        EditorGUILayout.PropertyField(criticalHitChance);
         EditorGUILayout.PropertyField(energyConsume);
         EditorGUILayout.PropertyField(gunSprite);
         EditorGUILayout.PropertyField(firePoint);

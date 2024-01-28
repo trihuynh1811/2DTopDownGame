@@ -22,7 +22,8 @@ public class Gun : MonoBehaviour
     [SerializeField] LayerMask hitObjectLayerMask;
     [SerializeField] float rayCastLength;
 
-    [SerializeField] float damage;
+    [SerializeField] int damage;
+    [SerializeField] int criticalHitChance;
     public int energyConsume;
     public SpriteRenderer gunSprite;
     [SerializeField] Transform firePoint;
@@ -37,12 +38,14 @@ public class Gun : MonoBehaviour
     float currentBulletSpeed;
     float currentRayCastLength;
     float distance;
+    int currentDamage;
     RaycastHit2D hitEnemy;
     RaycastHit2D hitObject;
     // Start is called before the first frame update
     private void Awake()
     {
         this.enabled = false;
+        currentDamage = damage;
         currentRayCastLength = rayCastLength;
         switch (gunType)
         {
@@ -119,6 +122,7 @@ public class Gun : MonoBehaviour
 
     void Shoot()
     {
+        CalculteCriticalHitChance();
         switch (gunType)
         {
             case GunType.NormalGun:
@@ -129,6 +133,7 @@ public class Gun : MonoBehaviour
                     currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
                     Vector2 direction = Quaternion.Euler(0, 0, spread) * firePoint.right;
                     GameObject bulletClone = Instantiate(bullet, firePoint.position, firePoint.rotation);
+                    bulletClone.GetComponent<Bullet>().SetDmg(currentDamage);
                     bulletClone.transform.right = direction.normalized;
                     bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
                 }
@@ -141,7 +146,7 @@ public class Gun : MonoBehaviour
                 hitEnemy = Physics2D.Raycast(firePoint.position, firePoint.right, currentRayCastLength, hitEnemyLayerMask);
                 if (hitEnemy && currentFireRate <= 0)
                 {
-                    hitEnemy.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
+                    hitEnemy.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(currentDamage);
                     currentFireRate = fireRate;
                 }
                 else
@@ -155,7 +160,7 @@ public class Gun : MonoBehaviour
                 hitObject = Physics2D.Raycast(firePoint.position, firePoint.right, rayCastLength, hitObjectLayerMask);
                 if (hitEnemy && currentFireRate <= 0)
                 {
-                    hitEnemy.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
+                    //hitEnemy.collider.gameObject.GetComponent<EnemyMovement>().TakeDamage(damage);
                     currentFireRate = fireRate;
                 }
                 if (hitObject)
@@ -176,6 +181,19 @@ public class Gun : MonoBehaviour
 
     }
 
+    void CalculteCriticalHitChance()
+    {
+        int randomChance = Random.Range(0, 100);
+
+        if(randomChance < criticalHitChance)
+        {
+            currentDamage *= 5;
+            Debug.Log("score critical hit");
+            return;
+        }
+        currentDamage = damage;
+    }
+
     public float GetCurrentFireRate()
     {
         return currentFireRate;
@@ -190,6 +208,12 @@ public class Gun : MonoBehaviour
     {
         return fireRate;
     }
+
+    public string Damage => damage.ToString();
+    public string CriticalHitChance => criticalHitChance.ToString() + "%";
+    public string EnergyConsume => energyConsume.ToString();
+    public string FireRate => ((1 - fireRate) * 100).ToString();
+    public string SpreadAngle => (100 - spreadAngle).ToString();
 
     private void OnDrawGizmos()
     {
