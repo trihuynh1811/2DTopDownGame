@@ -27,6 +27,7 @@ public class GunEditor : Editor
     SerializedProperty fireRate;
     SerializedProperty spreadAngle;
     SerializedProperty numberOfBullet;
+    SerializedProperty isShotGun;
 
     void OnEnable()
     {
@@ -53,6 +54,7 @@ public class GunEditor : Editor
         fireRate = serializedObject.FindProperty("fireRate");
         spreadAngle = serializedObject.FindProperty("spreadAngle");
         numberOfBullet = serializedObject.FindProperty("numberOfBullet");
+        isShotGun = serializedObject.FindProperty("isShotGun");
     }
 
     public override void OnInspectorGUI()
@@ -99,6 +101,7 @@ public class GunEditor : Editor
         EditorGUILayout.PropertyField(minBulletSpeed);
         EditorGUILayout.PropertyField(spreadAngle);
         EditorGUILayout.PropertyField(numberOfBullet);
+        EditorGUILayout.PropertyField(isShotGun);
     }
 
     public void displaySettingForFlameThrower()

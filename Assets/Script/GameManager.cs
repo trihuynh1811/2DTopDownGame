@@ -14,6 +14,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] int numberOfMonsterPerSpawn, maxTime, maxWave;
     [SerializeField] List<GameObject> monsterList;
     [SerializeField] GameObject spawnIndicator;
+
+    [SerializeField] List<Transform> itemsPosList;
+    [SerializeField] List<GameObject> items;
+    [SerializeField] GameObject itemPosObject;
+    List<GameObject> currentItemList;
+
     float currentSpawnRate;
     float spawnX, spawnY;
     int randomNumberOfMonsterToSpawn, time, wave = 1;
@@ -28,6 +34,7 @@ public class GameManager : MonoBehaviour
         time = maxTime;
         timerText.text = time.ToString();
         triggerNewWaveObject.SetActive(false);
+        itemPosObject.SetActive(false);
         InvokeRepeating("CountDown", 1, 1);
     }
 
@@ -46,16 +53,17 @@ public class GameManager : MonoBehaviour
             timerRunning = true;
             newWaveStart = false;
             endOfWave = false;
+            currentItemList.Clear();
             foreach(GameObject monster in spawnedMonsterList)
             {
                 Destroy(monster);
             }
+            itemPosObject.SetActive(false);
             spawnedMonsterList.Clear();
             triggerNewWaveObject.SetActive(false);
             wave++;
             Debug.Log(wave);
         }
-
     }
 
     void Spawn()
@@ -92,6 +100,15 @@ public class GameManager : MonoBehaviour
                 timerRunning = false;
                 triggerNewWaveObject.SetActive(true);
                 endOfWave = true;
+                currentItemList = items;
+                for (int i = 0; i < itemsPosList.Count; i++)
+                {
+                    int randomItemIndex = Random.Range(0, currentItemList.Count);
+
+                    Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
+                    currentItemList.RemoveAt(randomItemIndex);
+                }
+                itemPosObject.SetActive(true);
             }
         }
 

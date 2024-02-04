@@ -7,7 +7,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
     [SerializeField] int maxBounceTime;
     [SerializeField] float maxExistTime;
-    [SerializeField] bool canBounce;
+    public bool canBounce { get; set; }
     int damage;
     Vector3 lastVelocity;
     int currentBounceTime;
@@ -41,6 +41,7 @@ public class Bullet : MonoBehaviour
         switch (collision.gameObject.tag)
         {
             case "Enemy":
+                collision.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
                 Destroy(gameObject);
                 break;
 

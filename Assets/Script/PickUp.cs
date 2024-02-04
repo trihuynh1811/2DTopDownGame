@@ -99,6 +99,7 @@ public class PickUp : MonoBehaviour
         currentWeapon.SetActive(false);
         currentWeapon.GetComponent<Gun>().ResetCurrentFireRate();
         currentWeapon = weaponList[next];
+        currentWeapon.GetComponent<Gun>().ApplyBuff();
         gunImg.sprite = currentWeapon.GetComponent<Gun>().gunSprite.sprite;
         energyText.text = currentWeapon.GetComponent<Gun>().energyConsume.ToString();
         currentWeapon.SetActive(true);

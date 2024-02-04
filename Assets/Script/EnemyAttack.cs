@@ -6,19 +6,39 @@ public class EnemyAttack : MonoBehaviour
 {
     public enum AttackType
     {
+        SelfDestruct,
+        ShootLaser
+    }
+    public AttackType attackType;
+    [SerializeField] GameObject player;
+    [SerializeField] GameObject deathEffect;
+    [SerializeField] float explosionForce, explosionTime, splashRadius;
 
+    private void Awake()
+    {
+        player = GameObject.Find("Player");
     }
 
-    [SerializeField]
-    // Start is called before the first frame update
-    void Start()
+    public void Attack()
     {
-        
+        switch (attackType)
+        {
+            case AttackType.SelfDestruct:
+                Suicide();
+                break;
+            default:
+                Debug.Log("Attacking the player");
+                break;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void Suicide()
     {
-        
+        Instantiate(deathEffect, transform.position, Quaternion.identity);
+        Vector2 explosionVector = (player.GetComponent<Rigidbody2D>().transform.position - transform.position).normalized;
+        TopDownPlayerMovement.instance.explosionForce =  new Vector2(explosionVector.x * explosionForce, explosionVector.y * explosionForce);
+        TopDownPlayerMovement.instance.explosionTime = explosionTime;
+        TopDownPlayerMovement.instance.fadeDuration = explosionTime;
+        gameObject.SetActive(false);
     }
 }

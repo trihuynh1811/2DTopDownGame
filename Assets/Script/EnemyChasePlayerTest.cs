@@ -3,71 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 
-//public class EnemyChasePlayerTest : MonoBehaviour
-//{
-//    public float speed = 10.0f;
-//    public float diststop = 1.5f;
-
-//    public Transform target;
-//    private Rigidbody2D rb;
-//    public float avoidanceRadius = 2.0f;
-//    public float avoidanceForce;
-
-//    private Vector2 Position
-//    {
-//        get
-//        {
-//            return transform.position;
-//        }
-//        set
-//        {
-//            transform.position = value;
-//        }
-//    }
-
-//    private void Start()
-//    {
-//        target = GameObject.Find("Player").transform;
-//        rb = GetComponent<Rigidbody2D>();
-//    }
-
-//    private void FixedUpdate()
-//    {
-//        float dist = Vector2.Distance(Position, target.position);
-//        float step;
-//        Vector2 avoidanceVector = AvoidOtherEnemies();
-
-//        if (dist <= diststop)
-//        {
-//            step = 0;
-//        }
-//        else
-//        {
-//            step = speed * Time.deltaTime;
-//        }
-//        Position = Vector2.MoveTowards(Position, (Vector2)target.position + avoidanceVector, step);
-//        rb.MovePosition(Position);
-//    }
-//    private Vector2 AvoidOtherEnemies()
-//    {
-//        Vector2 avoidanceVector = Vector2.zero;
-
-//        Collider2D[] colliders = Physics2D.OverlapCircleAll(Position, avoidanceRadius);
-//        foreach (Collider2D collider in colliders)
-//        {
-//            if (collider != null && collider.gameObject != gameObject && collider.CompareTag("Enemy"))
-//            {
-//                Vector2 avoidDirection = (Position - (Vector2)collider.transform.position).normalized * avoidanceForce;
-//                avoidanceVector += avoidDirection;
-//            }
-//        }
-
-//        return avoidanceVector.normalized;
-//    }
-//}
-
 public class EnemyChasePlayerTest : MonoBehaviour
 {
+    [SerializeField] EnemyAttack attack;
+
     [SerializeField] float transformRotationSpeed, followRange, attackRange;
     [SerializeField] Animator animator;
     [SerializeField] AnimationClip deadAnimation;
@@ -88,6 +27,12 @@ public class EnemyChasePlayerTest : MonoBehaviour
     bool reachedEndOfPath;
     float distanceToPlayer;
     bool isDead;
+
+    private void Awake()
+    {
+        gameObject.AddComponent(typeof(EnemyAttack));
+        gameObject.AddComponent(typeof(EnemyTakeDmg));
+    }
 
     private void Start()
     {
@@ -176,6 +121,8 @@ public class EnemyChasePlayerTest : MonoBehaviour
             if (distanceToPlayer <= attackRange)
             {
                 currentSpeed = 0;
+                if (attack != null)
+                    attack.Attack();
             }
             else
             {
@@ -228,7 +175,10 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
     void Dead()
     {
-        animator.Play(deadAnimation.name);
+        if (animator != null)
+        {
+            animator.Play(deadAnimation.name);
+        }
         c2d.enabled = false;
         rb.freezeRotation = true;
         this.enabled = false;
@@ -239,6 +189,7 @@ public class EnemyChasePlayerTest : MonoBehaviour
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, avoidanceRadius);
     }
+
 }
 
 

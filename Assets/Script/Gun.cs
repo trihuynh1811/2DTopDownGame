@@ -33,12 +33,17 @@ public class Gun : MonoBehaviour
     [SerializeField] float fireRate;
     [SerializeField] float spreadAngle;
     [SerializeField] int numberOfBullet;
+    [SerializeField] bool isShotGun;
     float currentFireRate;
     float spread;
     float currentBulletSpeed;
     float currentRayCastLength;
     float distance;
     int currentDamage;
+    int currentNumberOfBullet;
+    int currentCriticalChance;
+    float currentSpreadAngle;
+    float currentRateOfFire;
     RaycastHit2D hitEnemy;
     RaycastHit2D hitObject;
     // Start is called before the first frame update
@@ -46,6 +51,9 @@ public class Gun : MonoBehaviour
     {
         this.enabled = false;
         currentDamage = damage;
+        currentNumberOfBullet = numberOfBullet;
+        currentCriticalChance = criticalHitChance;
+        currentSpreadAngle = spreadAngle;
         currentRayCastLength = rayCastLength;
         switch (gunType)
         {
@@ -122,17 +130,18 @@ public class Gun : MonoBehaviour
 
     void Shoot()
     {
-        CalculteCriticalHitChance();
         switch (gunType)
         {
             case GunType.NormalGun:
-                currentFireRate = fireRate;
-                for (int i = 0; i < numberOfBullet; i++)
+                currentFireRate = fireRate - (fireRate * TopDownPlayerMovement.instance.rateOfFire);
+                for (int i = 0; i < currentNumberOfBullet; i++)
                 {
-                    spread = Random.Range(-spreadAngle, spreadAngle);
+                    CalculteCriticalHitChance();
+                    spread = Random.Range(-currentSpreadAngle, currentSpreadAngle);
                     currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
                     Vector2 direction = Quaternion.Euler(0, 0, spread) * firePoint.right;
                     GameObject bulletClone = Instantiate(bullet, firePoint.position, firePoint.rotation);
+                    bulletClone.GetComponent<Bullet>().canBounce = TopDownPlayerMovement.instance.canBounce;
                     bulletClone.GetComponent<Bullet>().SetDmg(currentDamage);
                     bulletClone.transform.right = direction.normalized;
                     bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
@@ -185,13 +194,37 @@ public class Gun : MonoBehaviour
     {
         int randomChance = Random.Range(0, 100);
 
-        if(randomChance < criticalHitChance)
+        if(randomChance < currentCriticalChance)
         {
             currentDamage *= 5;
             Debug.Log("score critical hit");
             return;
         }
-        currentDamage = damage;
+        currentDamage = damage + TopDownPlayerMovement.instance.dmg;
+    }
+
+    public void ApplyBuff()
+    {
+        if(currentSpreadAngle <= 0)
+        {
+            Debug.Log("currentSpreadAngle <= 0");
+            currentSpreadAngle = 0.01f;
+            return;
+        }
+
+        if(currentNumberOfBullet != numberOfBullet + TopDownPlayerMovement.instance.numberOfBullet && isShotGun)
+        {
+            currentNumberOfBullet = numberOfBullet + TopDownPlayerMovement.instance.numberOfBullet;
+        }
+        if(currentSpreadAngle != spreadAngle - (spreadAngle * TopDownPlayerMovement.instance.accuracy))
+        {
+            currentSpreadAngle = spreadAngle - (spreadAngle * TopDownPlayerMovement.instance.accuracy);
+        }
+        if (currentCriticalChance != criticalHitChance + TopDownPlayerMovement.instance.criticalChance)
+        {
+            currentCriticalChance = criticalHitChance + TopDownPlayerMovement.instance.criticalChance;
+        }
+        
     }
 
     public float GetCurrentFireRate()
@@ -212,8 +245,8 @@ public class Gun : MonoBehaviour
     public string Damage => damage.ToString();
     public string CriticalHitChance => criticalHitChance.ToString() + "%";
     public string EnergyConsume => energyConsume.ToString();
-    public string FireRate => ((1 - fireRate) * 100).ToString();
-    public string SpreadAngle => (100 - spreadAngle).ToString();
+    public string FireRate => (60/fireRate).ToString();
+    public string SpreadAngle => (100 - spreadAngle).ToString() + "%";
 
     private void OnDrawGizmos()
     {

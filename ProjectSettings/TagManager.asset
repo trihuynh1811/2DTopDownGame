@@ -8,6 +8,7 @@ TagManager:
   - Ground/Wall
   - Weapon
   - Flame
+  - Buff
   layers:
   - Default
   - TransparentFX
@@ -54,9 +55,9 @@ TagManager:
   - name: Enemy
     uniqueID: 620991001
     locked: 0
-  - name: Player
-    uniqueID: 1429962789
-    locked: 0
   - name: Object
     uniqueID: 193984641
+    locked: 0
+  - name: Player
+    uniqueID: 1429962789
     locked: 0
