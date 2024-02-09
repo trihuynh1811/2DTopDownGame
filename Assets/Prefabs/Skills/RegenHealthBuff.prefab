@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 2ff2e234ec6007b4381a861b4ed0d9ef, type: 3}
-  m_Color: {r: 0.9748758, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 371680130639101091}
   - component: {fileID: 7571421572174189505}
   - component: {fileID: 4650646670972826455}
+  - component: {fileID: -3564377642439254822}
   m_Layer: 10
   m_Name: RegenHealthBuff
   m_TagString: Buff
@@ -258,3 +259,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &-3564377642439254822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6613394051507574648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 1
+  itemName: Health Regen
+  price: 0
+  dropChance: 0
+  itemDescription: Health regenerate when below 50% of max health

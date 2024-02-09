@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2595036350690159883}
   - component: {fileID: 82559078005840941}
   - component: {fileID: 8820258371344139443}
+  - component: {fileID: 4853801860170123726}
   m_Layer: 10
   m_Name: IncreaseMovementSpeedBuff
   m_TagString: Buff
@@ -174,6 +175,23 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &4853801860170123726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2299384590807901933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 1
+  itemName: Move Faster
+  price: 0
+  dropChance: 0
+  itemDescription: Movement speed +2
 --- !u!1 &6977298252258986760
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,7 +266,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: e76e155741a555149a38eabb8a8fcdc5, type: 3}
-  m_Color: {r: 0.9748758, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

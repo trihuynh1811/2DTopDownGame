@@ -11,13 +11,11 @@ public class Bullet : MonoBehaviour
     int damage;
     Vector3 lastVelocity;
     int currentBounceTime;
+    Coroutine _returnToPoolTime;
 
-    private void Start()
+    private void OnEnable()
     {
-        if (!canBounce)
-        {
-            StartCoroutine(DestroyAfter());
-        }
+        _returnToPoolTime = StartCoroutine(DestroyAfter());
     }
 
     // Update is called once per frame
@@ -30,7 +28,7 @@ public class Bullet : MonoBehaviour
         switch (collision.gameObject.tag)
         {
             case "Enemy":
-                Destroy(gameObject);
+                ObjectPoolManager.ReturnObjectToPool(gameObject);
                 break;
         }
     }
@@ -42,7 +40,7 @@ public class Bullet : MonoBehaviour
         {
             case "Enemy":
                 collision.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
-                Destroy(gameObject);
+                ObjectPoolManager.ReturnObjectToPool(gameObject);
                 break;
 
             case "Ground/Wall":
@@ -51,7 +49,7 @@ public class Bullet : MonoBehaviour
                     currentBounceTime++;
                     if (currentBounceTime > maxBounceTime)
                     {
-                        Destroy(gameObject);
+                        ObjectPoolManager.ReturnObjectToPool(gameObject);
                     }
                     var speed = lastVelocity.magnitude;
                     var direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
@@ -60,7 +58,7 @@ public class Bullet : MonoBehaviour
                 }
                 else
                 {
-                    Destroy(gameObject);
+                    ObjectPoolManager.ReturnObjectToPool(gameObject);
                 }
                 break;
         }
@@ -73,7 +71,13 @@ public class Bullet : MonoBehaviour
 
     IEnumerator DestroyAfter()
     {
-        yield return new WaitForSeconds(maxExistTime);
-        Destroy(gameObject);
+        //Destroy(gameObject);
+        float elapsedTime = 0;
+        while(elapsedTime < maxExistTime)
+        {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        ObjectPoolManager.ReturnObjectToPool(gameObject);
     }
 }

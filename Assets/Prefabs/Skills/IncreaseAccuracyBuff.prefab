@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: fe53f86461d059f478648cfacec15ac4, type: 3}
-  m_Color: {r: 0.9748758, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 5873891915667321022}
   - component: {fileID: 354110370000638878}
   - component: {fileID: 3229302146378852949}
+  - component: {fileID: -1862825624473856427}
   m_Layer: 10
   m_Name: IncreaseAccuracyBuff
   m_TagString: Buff
@@ -258,3 +259,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &-1862825624473856427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4108004152563192712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 1
+  itemName: More Accuracy
+  price: 0
+  dropChance: 0
+  itemDescription: 'Weapon accuracy +10%
+
+'

@@ -15,6 +15,7 @@ public class Buff : MonoBehaviour
         MoreWeaponAccuracy,
         MoreWeaponCriticalChance,
         MoreBulletForShotgun,
+        MoreCriticalDmgMultiplier,
         CanBounce
     }
 

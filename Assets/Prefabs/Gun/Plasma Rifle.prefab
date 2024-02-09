@@ -127,6 +127,7 @@ GameObject:
   - component: {fileID: 6259304985815810263}
   - component: {fileID: 8471912841418959580}
   - component: {fileID: 7069047482499632407}
+  - component: {fileID: 5185140854934730045}
   m_Layer: 9
   m_Name: Plasma Rifle
   m_TagString: Weapon
@@ -259,3 +260,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.3056021, y: 0.5431943}
   m_EdgeRadius: 0
+--- !u!114 &5185140854934730045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9057977431899120623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Plasma Rifle
+  price: 20
+  dropChance: 0
+  itemDescription: 

@@ -75,7 +75,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1429962789
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: df39d3b7132099d4ca1cbdd49434aa4d, type: 3}
   m_Color: {r: 0, g: 0.09038945, b: 0.94716984, a: 1}
@@ -175,7 +175,6 @@ MonoBehaviour:
   rb: {fileID: 3778479256735862224}
   maxBounceTime: 3
   maxExistTime: 10
-  canBounce: 1
 --- !u!1 &5348950477181381758
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,7 +191,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3533789466047870566
 Transform:
   m_ObjectHideFlags: 0
@@ -248,7 +247,7 @@ TrailRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1429962789
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Time: 1
   m_PreviewTimeScale: 1

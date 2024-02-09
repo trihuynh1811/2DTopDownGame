@@ -9,7 +9,8 @@ public class YourScriptEditor : Editor
     SerializedProperty mainCam;
     SerializedProperty offset;
     SerializedProperty pickUp;
-    SerializedProperty pickUpMask;
+    SerializedProperty weaponMask;
+    SerializedProperty buffMask;
     SerializedProperty pickUpRadius;
     SerializedProperty boxCollider;
     SerializedProperty gunPos;
@@ -17,6 +18,12 @@ public class YourScriptEditor : Editor
     SerializedProperty animator;
     SerializedProperty rb;
     SerializedProperty speed;
+    SerializedProperty floatingText;
+    SerializedProperty floatingTextPos;
+    SerializedProperty randomFloatingTextPos;
+    SerializedProperty flashDuration;
+    SerializedProperty playerSprite;
+    SerializedProperty hurtMat;
     SerializedProperty magnitude;
 
     SerializedProperty healthSlider;
@@ -46,7 +53,8 @@ public class YourScriptEditor : Editor
         mainCam = serializedObject.FindProperty("mainCam");
         offset = serializedObject.FindProperty("offset");
         pickUp = serializedObject.FindProperty("pickUp");
-        pickUpMask = serializedObject.FindProperty("pickUpMask");
+        weaponMask = serializedObject.FindProperty("weaponMask");
+        buffMask = serializedObject.FindProperty("buffMask");
         pickUpRadius = serializedObject.FindProperty("pickUpRadius");
         boxCollider = serializedObject.FindProperty("boxCollider");
         gunPos = serializedObject.FindProperty("gunPos");
@@ -54,6 +62,12 @@ public class YourScriptEditor : Editor
         animator = serializedObject.FindProperty("animator");
         rb = serializedObject.FindProperty("rb");
         speed = serializedObject.FindProperty("speed");
+        floatingText = serializedObject.FindProperty("floatingText");
+        floatingTextPos = serializedObject.FindProperty("floatingTextPos");
+        randomFloatingTextPos = serializedObject.FindProperty("randomFloatingTextPos");
+        flashDuration = serializedObject.FindProperty("flashDuration");
+        playerSprite = serializedObject.FindProperty("playerSprite");
+        hurtMat = serializedObject.FindProperty("hurtMat");
         magnitude = serializedObject.FindProperty("magnitude");
 
         healthSlider = serializedObject.FindProperty("healthSlider");
@@ -103,7 +117,8 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(mainCam);
         EditorGUILayout.PropertyField(offset);
         EditorGUILayout.PropertyField(pickUp);
-        EditorGUILayout.PropertyField(pickUpMask);
+        EditorGUILayout.PropertyField(weaponMask);
+        EditorGUILayout.PropertyField(buffMask);
         EditorGUILayout.PropertyField(pickUpRadius);
         EditorGUILayout.PropertyField(boxCollider);
         EditorGUILayout.PropertyField(gunPos);
@@ -111,6 +126,12 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(animator);
         EditorGUILayout.PropertyField(rb);
         EditorGUILayout.PropertyField(speed);
+        EditorGUILayout.PropertyField(floatingText);
+        EditorGUILayout.PropertyField(floatingTextPos);
+        EditorGUILayout.PropertyField(randomFloatingTextPos);
+        EditorGUILayout.PropertyField(flashDuration);
+        EditorGUILayout.PropertyField(playerSprite);
+        EditorGUILayout.PropertyField(hurtMat);
         EditorGUILayout.PropertyField(magnitude);
     }
 

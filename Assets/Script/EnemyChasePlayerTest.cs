@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 
+[RequireComponent(typeof(EnemyAttack), typeof(EnemyTakeDmg))]
 public class EnemyChasePlayerTest : MonoBehaviour
 {
     [SerializeField] EnemyAttack attack;
+    [SerializeField] EnemyTakeDmg takeDmg;
 
     [SerializeField] float transformRotationSpeed, followRange, attackRange;
     [SerializeField] Animator animator;
     [SerializeField] AnimationClip deadAnimation;
     [SerializeField] Collider2D c2d;
-    [SerializeField] bool rotateX, rotateY, rotateZ, homingLikeRotate;
+    [SerializeField] bool rotateX, rotateY, rotateZ, homingLikeRotate, explodeWhenDie;
 
     public float speed = 5f;
     public float avoidanceRadius = 2f;
@@ -30,8 +32,7 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
     private void Awake()
     {
-        gameObject.AddComponent(typeof(EnemyAttack));
-        gameObject.AddComponent(typeof(EnemyTakeDmg));
+
     }
 
     private void Start()
@@ -61,7 +62,7 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.endOfWave)
+        if (GameManager.endOfWave || takeDmg.health <= 0)
         {
             isDead = true;
             Dead();
@@ -127,6 +128,8 @@ public class EnemyChasePlayerTest : MonoBehaviour
             else
             {
                 currentSpeed = speed;
+                if (attack != null)
+                    attack.DisableAttack();
             }
         }
 
@@ -178,6 +181,10 @@ public class EnemyChasePlayerTest : MonoBehaviour
         if (animator != null)
         {
             animator.Play(deadAnimation.name);
+        }
+        if (explodeWhenDie)
+        {
+            attack.Explode();
         }
         c2d.enabled = false;
         rb.freezeRotation = true;

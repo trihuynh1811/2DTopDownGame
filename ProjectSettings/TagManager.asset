@@ -9,6 +9,9 @@ TagManager:
   - Weapon
   - Flame
   - Buff
+  - ItemPos
+  - RefreshItemCube
+  - LockItemCube
   layers:
   - Default
   - TransparentFX

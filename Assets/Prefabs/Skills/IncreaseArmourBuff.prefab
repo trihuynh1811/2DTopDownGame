@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: bf0f8d811eb403e4695f6c2023d076e5, type: 3}
-  m_Color: {r: 0.9748758, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 8714488052405264110}
   - component: {fileID: 8067177979484284498}
   - component: {fileID: 1670372156359344517}
+  - component: {fileID: 5628578326765765141}
   m_Layer: 10
   m_Name: IncreaseArmourBuff
   m_TagString: Buff
@@ -229,7 +230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4d827a9231f5644e94bd7b957f2c3c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buffType: 2
+  buffType: 0
   buffAmount: 2
 --- !u!50 &1670372156359344517
 Rigidbody2D:
@@ -258,3 +259,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &5628578326765765141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5839681690117210329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 1
+  itemName: More Armour
+  price: 0
+  dropChance: 0
+  itemDescription: Max armour +2

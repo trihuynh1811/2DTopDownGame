@@ -127,6 +127,7 @@ GameObject:
   - component: {fileID: 4050006840090442569}
   - component: {fileID: 6237426242054264997}
   - component: {fileID: 3670077689200012625}
+  - component: {fileID: 7169062236312506511}
   m_Layer: 9
   m_Name: Plasma Shotgun
   m_TagString: Weapon
@@ -259,3 +260,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.7618225, y: 0.44328374}
   m_EdgeRadius: 0
+--- !u!114 &7169062236312506511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8864341271447252000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Plasma Shotgun
+  price: 50
+  dropChance: 0
+  itemDescription: 

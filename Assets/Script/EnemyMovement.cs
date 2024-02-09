@@ -227,7 +227,7 @@ public class EnemyMovement : MonoBehaviour, ITakeDamage
         }
     }
 
-    public void TakeDamage(float dmg)
+    public void TakeDamage(int dmg)
     {
         health -= dmg;
     }

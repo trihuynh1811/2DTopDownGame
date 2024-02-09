@@ -3,20 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TopDownPlayerMovement : MonoBehaviour
+public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 {
     public static TopDownPlayerMovement instance;
     [SerializeField] Transform cam, camFollowPos;
     [SerializeField] Camera mainCam;
     [SerializeField] Vector3 offset;
     [SerializeField] PickUp pickUp;
-    [SerializeField] LayerMask pickUpMask;
+    [SerializeField] LayerMask weaponMask, buffMask;
     [SerializeField] float pickUpRadius;
     [SerializeField] BoxCollider2D boxCollider;
     [SerializeField] Transform gunPos, buffPos;
     [SerializeField] Animator animator;
     [SerializeField] Rigidbody2D rb;
     [SerializeField] float speed;
+    // player take damage
+    [SerializeField] GameObject floatingText;
+    [SerializeField] Transform floatingTextPos;
+    [SerializeField] Vector2 randomFloatingTextPos;
+    [SerializeField] float flashDuration;
+    [SerializeField] SpriteRenderer playerSprite;
+    [SerializeField] Material hurtMat;
     // for camera shake
     [SerializeField] float magnitude;
 
@@ -33,14 +40,16 @@ public class TopDownPlayerMovement : MonoBehaviour
     public int dmg { get; set; }
     public int numberOfBullet { get; set; }
     public int criticalChance { get; set; }
+    public int criticalDmgMultiplier { get; set; } = 2;
     public float accuracy { get; set; }
     public float rateOfFire { get; set; }
     public bool canBounce { get; set; }
 
-    Vector2 moveDirection;
+    Vector2 moveDirection, newFloatingTextPos;
+    Material originalMat;
     bool m_FacingRight = true;
     float moveX, moveY;
-    Collider2D collider_;
+    Collider2D weaponCollider, buffCollider;
     float energyDeductionRate;
     // for camera shake
     float fadeElapsed = 0f;
@@ -53,6 +62,7 @@ public class TopDownPlayerMovement : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        originalMat = playerSprite.material;
     }
 
     private void Start()
@@ -98,6 +108,16 @@ public class TopDownPlayerMovement : MonoBehaviour
     }
     void GetInput()
     {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            pickUp.DropWeapon();
+            pickUp.SwitchWeapon();
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            pickUp.SwitchWeapon();
+        }
+
         if (isPushed)
         {
             return;
@@ -179,81 +199,20 @@ public class TopDownPlayerMovement : MonoBehaviour
 
     void PickUpAndDropItem()
     {
-        collider_ = Physics2D.OverlapCircle(transform.position, pickUpRadius, pickUpMask);
-        if (collider_)
+        weaponCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, weaponMask);
+        buffCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, buffMask);
+        if (weaponCollider)
         {
-            if (collider_.gameObject.CompareTag("Weapon"))
+            weaponDmg.text = weaponCollider.gameObject.GetComponent<Gun>().Damage;
+            weaponRoF.text = weaponCollider.gameObject.GetComponent<Gun>().FireRate;
+            weaponEnergyConsume.text = weaponCollider.gameObject.GetComponent<Gun>().EnergyConsume;
+            weaponCriticalHit.text = weaponCollider.gameObject.GetComponent<Gun>().CriticalHitChance;
+            weaponAccuracy.text = weaponCollider.gameObject.GetComponent<Gun>().SpreadAngle;
+            weaponStatCanvas.SetActive(true);
+            if (Input.GetKeyDown(KeyCode.X))
             {
-                weaponDmg.text = collider_.gameObject.GetComponent<Gun>().Damage;
-                weaponRoF.text = collider_.gameObject.GetComponent<Gun>().FireRate;
-                weaponEnergyConsume.text = collider_.gameObject.GetComponent<Gun>().EnergyConsume;
-                weaponCriticalHit.text = collider_.gameObject.GetComponent<Gun>().CriticalHitChance;
-                weaponAccuracy.text = collider_.gameObject.GetComponent<Gun>().SpreadAngle;
-                weaponStatCanvas.SetActive(true);
-                if (Input.GetKeyDown(KeyCode.X))
-                {
-                    pickUp.PickUpWeapon(collider_.gameObject);
-                }
+                pickUp.PickUpWeapon(weaponCollider.gameObject);
             }
-            else
-            {
-                weaponDmg.text = "";
-                weaponRoF.text = "";
-                weaponEnergyConsume.text = "";
-                weaponCriticalHit.text = "";
-                weaponAccuracy.text = "";
-                weaponStatCanvas.SetActive(false);
-            }
-            if (collider_.gameObject.CompareTag("Buff"))
-            {
-                Buff buff = collider_.gameObject.GetComponent<Buff>();
-                if (Input.GetKeyDown(KeyCode.X))
-                {
-                    switch (buff.buffType)
-                    {
-                        case Buff.BuffType.MoreHealth:
-                            SetMaxHealth(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.MoreEnergy:
-                            SetMaxEnergy(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.MoreArmour:
-                            SetMaxArmour(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.MoreSpeed:
-                            SetSpeed(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.MoreWeaponDmg:
-                            SetDmg(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.MoreBulletForShotgun:
-                            SetNumberOfBullet(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.MoreWeaponRoF:
-                            SetRoF();
-                            break;
-                        case Buff.BuffType.MoreWeaponAccuracy:
-                            SetAccuracy();
-                            break;
-                        case Buff.BuffType.MoreWeaponCriticalChance:
-                            SetCriticalChance(buff.buffAmount);
-                            break;
-                        case Buff.BuffType.CanBounce:
-                            SetCanBounce(true);
-                            break;
-                    }
-                    collider_.gameObject.transform.parent = buffPos;
-                    collider_.gameObject.transform.localPosition = Vector3.zero;
-                    StartCoroutine(collider_.gameObject.GetComponent<Buff>().BuffPickUpEffect());
-                    if (pickUp.GetCurrentWeapon() != null)
-                    {
-                        pickUp.GetCurrentWeapon().GetComponent<Gun>().ApplyBuff();
-                    }
-
-                }
-            }
-
-
         }
         else
         {
@@ -264,16 +223,73 @@ public class TopDownPlayerMovement : MonoBehaviour
             weaponAccuracy.text = "";
             weaponStatCanvas.SetActive(false);
         }
-        if (Input.GetKeyDown(KeyCode.T))
+
+        if (buffCollider)
         {
-            pickUp.DropWeapon();
-            pickUp.SwitchWeapon();
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            pickUp.SwitchWeapon();
+            switch (buffCollider.gameObject.tag)
+            {
+                case "Buff":
+                    Buff buff = weaponCollider.gameObject.GetComponent<Buff>();
+                    if (Input.GetKeyDown(KeyCode.X))
+                    {
+                        switch (buff.buffType)
+                        {
+                            case Buff.BuffType.MoreHealth:
+                                SetMaxHealth(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreEnergy:
+                                SetMaxEnergy(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreArmour:
+                                SetMaxArmour(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreSpeed:
+                                SetSpeed(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreWeaponDmg:
+                                SetDmg(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreBulletForShotgun:
+                                SetNumberOfBullet(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreWeaponRoF:
+                                SetRoF();
+                                break;
+                            case Buff.BuffType.MoreWeaponAccuracy:
+                                SetAccuracy();
+                                break;
+                            case Buff.BuffType.MoreWeaponCriticalChance:
+                                SetCriticalChance(buff.buffAmount);
+                                break;
+                            case Buff.BuffType.MoreCriticalDmgMultiplier:
+                                SetCriticalDmgMultiplier();
+                                break;
+                            case Buff.BuffType.CanBounce:
+                                SetCanBounce(true);
+                                break;
+                        }
+                        weaponCollider.gameObject.transform.parent = buffPos;
+                        weaponCollider.gameObject.transform.localPosition = Vector3.zero;
+                        StartCoroutine(weaponCollider.gameObject.GetComponent<Buff>().BuffPickUpEffect());
+                        if (pickUp.GetCurrentWeapon() != null)
+                        {
+                            pickUp.GetCurrentWeapon().GetComponent<Gun>().ApplyBuff();
+                        }
+
+                    }
+                    break;
+
+                case "RefreshItemCube":
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        GameManager.instance.RefreshNewItem();
+                    }
+                    break;
+            }
+
         }
     }
+
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
@@ -283,6 +299,7 @@ public class TopDownPlayerMovement : MonoBehaviour
     public void TakeDamage(int dmg)
     {
         armour -= dmg;
+        ShowDamage(dmg);
         if (armour <= 0)
         {
             armour = 0;
@@ -292,8 +309,25 @@ public class TopDownPlayerMovement : MonoBehaviour
                 health = 0;
             }
         }
+        StartCoroutine(GetHit());
         UpdateUi();
 
+    }
+
+    IEnumerator GetHit()
+    {
+        playerSprite.material = hurtMat;
+        yield return new WaitForSeconds(flashDuration);
+        playerSprite.material = originalMat;
+
+    }
+
+    void ShowDamage(int dmg)
+    {
+        newFloatingTextPos = new(floatingTextPos.position.x + Random.Range(-randomFloatingTextPos.x, randomFloatingTextPos.x), floatingTextPos.position.y + Random.Range(0, randomFloatingTextPos.y));
+        GameObject floatingTextClone = ObjectPoolManager.SpawnObject(floatingText, newFloatingTextPos, Quaternion.identity);
+        floatingTextClone.transform.SetParent(gameObject.transform);
+        floatingTextClone.GetComponent<TextMesh>().text = dmg.ToString();
     }
 
     void RegenerateArmor()
@@ -418,6 +452,10 @@ public class TopDownPlayerMovement : MonoBehaviour
         }
         criticalChance += moreCriticalChance;
     }
+    public void SetCriticalDmgMultiplier()
+    {
+        criticalDmgMultiplier *= 2;
+    }
     public void SetCanBounce(bool ableToBounce)
     {
         canBounce = ableToBounce;
@@ -429,4 +467,5 @@ public class TopDownPlayerMovement : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
     }
+
 }

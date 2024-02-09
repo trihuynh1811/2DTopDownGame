@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
     [SerializeField] Text timerText;
     [SerializeField] GameObject triggerNewWaveObject;
+    [SerializeField] Transform spawnedItemPos;
 
     [SerializeField] float minSpawnX, maxSpawnX;
     [SerializeField] float minSpawnY, maxSpawnY;
@@ -24,9 +27,15 @@ public class GameManager : MonoBehaviour
     float spawnX, spawnY;
     int randomNumberOfMonsterToSpawn, time, wave = 1;
     Vector2 newSpawnPoint;
-    bool timerRunning = true, newWaveStart;
+    bool timerRunning = true, newWaveStart, allStatsDisabled;
     public static List<GameObject> spawnedMonsterList = new List<GameObject>();
+    List<GameObject> spawnedItems = new List<GameObject>();
     [HideInInspector] public static bool endOfWave;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -58,6 +67,7 @@ public class GameManager : MonoBehaviour
             {
                 Destroy(monster);
             }
+            DisableStats();
             itemPosObject.SetActive(false);
             spawnedMonsterList.Clear();
             triggerNewWaveObject.SetActive(false);
@@ -100,18 +110,47 @@ public class GameManager : MonoBehaviour
                 timerRunning = false;
                 triggerNewWaveObject.SetActive(true);
                 endOfWave = true;
-                currentItemList = items;
+                currentItemList = items.ToList();
                 for (int i = 0; i < itemsPosList.Count; i++)
                 {
                     int randomItemIndex = Random.Range(0, currentItemList.Count);
 
-                    Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
+                    GameObject item = Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
+                    itemsPosList[i].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
+                    itemsPosList[i].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
                     currentItemList.RemoveAt(randomItemIndex);
+                    item.transform.parent = spawnedItemPos;
+                    //currentItemList.Remove(item);
+                    spawnedItems.Add(item);
                 }
                 itemPosObject.SetActive(true);
             }
         }
 
+    }
+
+    public void DisableStats()
+    {
+        itemsPosList.ForEach(x => x.GetComponent<Item>().itemCanvas.SetActive(false));
+    }
+
+    public void RefreshNewItem()
+    {
+        DisableStats();
+        spawnedItems.ForEach(x => x.SetActive(false));
+        currentItemList = items.ToList();
+        for (int i = 0; i < itemsPosList.Count; i++)
+        {
+            int randomItemIndex = Random.Range(0, currentItemList.Count);
+
+            GameObject item = Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
+            itemsPosList[i].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
+            itemsPosList[i].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
+            currentItemList.RemoveAt(randomItemIndex);
+            item.transform.parent = spawnedItemPos;
+            //currentItemList.Remove(item);
+            spawnedItems.Add(item);
+        }
     }
 
     GameObject randomMonster()

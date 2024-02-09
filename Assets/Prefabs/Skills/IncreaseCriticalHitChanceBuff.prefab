@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4102639590930831321}
   - component: {fileID: 1397035799419500125}
   - component: {fileID: 2759460522421376438}
+  - component: {fileID: 7327773869281842692}
   m_Layer: 10
   m_Name: IncreaseCriticalHitChanceBuff
   m_TagString: Buff
@@ -146,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buffType: 0
-  buffAmount: 3
+  buffAmount: 2
 --- !u!50 &2759460522421376438
 Rigidbody2D:
   serializedVersion: 4
@@ -174,6 +175,23 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &7327773869281842692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717399467687653830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 1
+  itemName: More Crit Chance
+  price: 0
+  dropChance: 0
+  itemDescription: Crit chance +2
 --- !u!1 &1976100907642916256
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,7 +266,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: d27b2af182728604ea4c0f5683e1690c, type: 3}
-  m_Color: {r: 0.9748758, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

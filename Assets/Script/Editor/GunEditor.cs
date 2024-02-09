@@ -12,8 +12,7 @@ public class GunEditor : Editor
 
     SerializedProperty flameParticle;
 
-    SerializedProperty hitEnemyLayerMask;
-    SerializedProperty hitObjectLayerMask;
+    SerializedProperty laserHitMask;
     SerializedProperty rayCastLength;
 
     SerializedProperty damage;
@@ -39,8 +38,7 @@ public class GunEditor : Editor
 
         flameParticle = serializedObject.FindProperty("flameParticle");
 
-        hitEnemyLayerMask = serializedObject.FindProperty("hitEnemyLayerMask");
-        hitObjectLayerMask = serializedObject.FindProperty("hitObjectLayerMask");
+        laserHitMask = serializedObject.FindProperty("laserHitMask");
         rayCastLength = serializedObject.FindProperty("rayCastLength");
 
         damage = serializedObject.FindProperty("damage");
@@ -107,7 +105,7 @@ public class GunEditor : Editor
     public void displaySettingForFlameThrower()
     {
         EditorGUILayout.PropertyField(flameParticle);
-        EditorGUILayout.PropertyField(hitEnemyLayerMask);
+        EditorGUILayout.PropertyField(laserHitMask);
         EditorGUILayout.PropertyField(rayCastLength);
     }
 
@@ -115,8 +113,7 @@ public class GunEditor : Editor
     public void displaySettingForLaser()
     {
         EditorGUILayout.PropertyField(laser);
-        EditorGUILayout.PropertyField(hitEnemyLayerMask);
-        EditorGUILayout.PropertyField(hitObjectLayerMask);
+        EditorGUILayout.PropertyField(laserHitMask);
         EditorGUILayout.PropertyField(rayCastLength);
         EditorGUILayout.PropertyField(laserStart);
         EditorGUILayout.PropertyField(laserEnd);
