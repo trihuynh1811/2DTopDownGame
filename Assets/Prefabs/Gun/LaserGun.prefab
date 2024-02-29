@@ -338,12 +338,9 @@ MonoBehaviour:
   laser: {fileID: 8176798546964904212}
   laserStart: {fileID: 7854871089456180463}
   laserEnd: {fileID: 8860399219317437814}
-  hitEnemyLayerMask:
+  laserHitMask:
     serializedVersion: 2
-    m_Bits: 128
-  hitObjectLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   rayCastLength: 30
   damage: 2
   criticalHitChance: 10
@@ -441,8 +438,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemType: 0
   itemName: Multi-Color Laser
-  price: 35
+  price: 75
   dropChance: 0
   itemDescription: 
 --- !u!1 &9077061660669566864

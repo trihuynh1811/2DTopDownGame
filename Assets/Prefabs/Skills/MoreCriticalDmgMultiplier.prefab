@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 7904039419755414661}
   - component: {fileID: 8086688573263257805}
   - component: {fileID: -7301734351021524574}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: MoreCriticalDmgMultiplier
   m_TagString: Buff
   m_Icon: {fileID: 0}
@@ -255,7 +255,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 2
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -273,6 +273,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 1
   itemName: More Deadlier
-  price: 0
+  price: 30
   dropChance: 0
   itemDescription: Crit damage x2

@@ -11,10 +11,12 @@ public class YourScriptEditor : Editor
     SerializedProperty pickUp;
     SerializedProperty weaponMask;
     SerializedProperty buffMask;
+    SerializedProperty itemMask;
     SerializedProperty pickUpRadius;
     SerializedProperty boxCollider;
     SerializedProperty gunPos;
     SerializedProperty buffPos;
+    SerializedProperty itemPos;
     SerializedProperty animator;
     SerializedProperty rb;
     SerializedProperty speed;
@@ -34,17 +36,34 @@ public class YourScriptEditor : Editor
     SerializedProperty maxEnergy;
     SerializedProperty regenerateArmourRate;
     SerializedProperty regenerateEnegeyRate;
+    SerializedProperty regenerateHealthRate;
     SerializedProperty weaponStatCanvas;
+    SerializedProperty buffDescCanvas;
+    SerializedProperty startNewWaveTxt;
     SerializedProperty weaponDmg;
     SerializedProperty weaponRoF;
     SerializedProperty weaponEnergyConsume;
     SerializedProperty weaponCriticalHit;
     SerializedProperty weaponAccuracy;
+    SerializedProperty buffDesc;
     SerializedProperty healthText;
     SerializedProperty armourText;
     SerializedProperty energyText;
+    SerializedProperty coinText;
 
-    bool showGeneralSetting, showUiSetting = false;
+    SerializedProperty buffStatPanel;
+    SerializedProperty maxHealthText;
+    SerializedProperty maxArmourText;
+    SerializedProperty maxEnergyText;
+    SerializedProperty weaponDamageText;
+    SerializedProperty weaponRofText;
+    SerializedProperty criticalChanceText;
+    SerializedProperty criticalDamageText;
+    SerializedProperty weaponAccuracyText;
+    SerializedProperty movementSpeedText;
+    SerializedProperty numberOfBulletText;
+
+    bool showGeneralSetting, showUiSetting = false, showBuffStatUiSetting = false;
 
     private void OnEnable()
     {
@@ -55,10 +74,12 @@ public class YourScriptEditor : Editor
         pickUp = serializedObject.FindProperty("pickUp");
         weaponMask = serializedObject.FindProperty("weaponMask");
         buffMask = serializedObject.FindProperty("buffMask");
+        itemMask = serializedObject.FindProperty("itemMask");
         pickUpRadius = serializedObject.FindProperty("pickUpRadius");
         boxCollider = serializedObject.FindProperty("boxCollider");
         gunPos = serializedObject.FindProperty("gunPos");
         buffPos = serializedObject.FindProperty("buffPos");
+        itemPos = serializedObject.FindProperty("itemPos");
         animator = serializedObject.FindProperty("animator");
         rb = serializedObject.FindProperty("rb");
         speed = serializedObject.FindProperty("speed");
@@ -78,15 +99,34 @@ public class YourScriptEditor : Editor
         maxEnergy = serializedObject.FindProperty("maxEnergy");
         regenerateArmourRate = serializedObject.FindProperty("regenerateArmourRate");
         regenerateEnegeyRate = serializedObject.FindProperty("regenerateEnegeyRate");
+        regenerateHealthRate = serializedObject.FindProperty("regenerateHealthRate");
         weaponStatCanvas = serializedObject.FindProperty("weaponStatCanvas");
+        buffDescCanvas = serializedObject.FindProperty("buffDescCanvas");
+        startNewWaveTxt = serializedObject.FindProperty("startNewWaveTxt");
         weaponDmg = serializedObject.FindProperty("weaponDmg");
         weaponRoF = serializedObject.FindProperty("weaponRoF");
         weaponEnergyConsume = serializedObject.FindProperty("weaponEnergyConsume");
         weaponCriticalHit = serializedObject.FindProperty("weaponCriticalHit");
         weaponAccuracy = serializedObject.FindProperty("weaponAccuracy");
+        buffDesc = serializedObject.FindProperty("buffDesc");
         healthText = serializedObject.FindProperty("healthText");
         armourText = serializedObject.FindProperty("armourText");
         energyText = serializedObject.FindProperty("energyText");
+        coinText = serializedObject.FindProperty("coinText");
+
+        buffStatPanel = serializedObject.FindProperty("buffStatPanel");
+        maxHealthText = serializedObject.FindProperty("maxHealthText");
+        maxArmourText = serializedObject.FindProperty("maxArmourText");
+        maxEnergyText = serializedObject.FindProperty("maxEnergyText");
+        weaponDamageText = serializedObject.FindProperty("weaponDamageText");
+        weaponRofText = serializedObject.FindProperty("weaponRofText");
+        criticalChanceText = serializedObject.FindProperty("criticalChanceText");
+        criticalDamageText = serializedObject.FindProperty("criticalDamageText");
+        weaponAccuracyText = serializedObject.FindProperty("weaponAccuracyText");
+        movementSpeedText = serializedObject.FindProperty("movementSpeedText");
+        numberOfBulletText = serializedObject.FindProperty("numberOfBulletText");
+
+
     }
 
     public override void OnInspectorGUI()
@@ -107,6 +147,13 @@ public class YourScriptEditor : Editor
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
+        showBuffStatUiSetting = EditorGUILayout.BeginFoldoutHeaderGroup(showBuffStatUiSetting, "Buff Stat UI Setting");
+        if (showBuffStatUiSetting)
+        {
+            ShowBuffStatUiSetting();
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+
         serializedObject.ApplyModifiedProperties();
     }
 
@@ -119,10 +166,12 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(pickUp);
         EditorGUILayout.PropertyField(weaponMask);
         EditorGUILayout.PropertyField(buffMask);
+        EditorGUILayout.PropertyField(itemMask);
         EditorGUILayout.PropertyField(pickUpRadius);
         EditorGUILayout.PropertyField(boxCollider);
         EditorGUILayout.PropertyField(gunPos);
         EditorGUILayout.PropertyField(buffPos);
+        EditorGUILayout.PropertyField(itemPos);
         EditorGUILayout.PropertyField(animator);
         EditorGUILayout.PropertyField(rb);
         EditorGUILayout.PropertyField(speed);
@@ -145,7 +194,9 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(maxEnergy);
         EditorGUILayout.PropertyField(regenerateArmourRate);
         EditorGUILayout.PropertyField(regenerateEnegeyRate);
+        EditorGUILayout.PropertyField(regenerateHealthRate);
         EditorGUILayout.PropertyField(weaponStatCanvas);
+        EditorGUILayout.PropertyField(startNewWaveTxt);
         EditorGUILayout.PropertyField(weaponDmg);
         EditorGUILayout.PropertyField(weaponRoF);
         EditorGUILayout.PropertyField(weaponEnergyConsume);
@@ -154,5 +205,25 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(healthText);
         EditorGUILayout.PropertyField(armourText);
         EditorGUILayout.PropertyField(energyText);
+        EditorGUILayout.PropertyField(coinText);
+
+
+    }
+
+    void ShowBuffStatUiSetting()
+    {
+        EditorGUILayout.PropertyField(buffDescCanvas);
+        EditorGUILayout.PropertyField(buffDesc);
+        EditorGUILayout.PropertyField(buffStatPanel);
+        EditorGUILayout.PropertyField(maxHealthText);
+        EditorGUILayout.PropertyField(maxArmourText);
+        EditorGUILayout.PropertyField(maxEnergyText);
+        EditorGUILayout.PropertyField(weaponDamageText);
+        EditorGUILayout.PropertyField(weaponRofText);
+        EditorGUILayout.PropertyField(criticalChanceText);
+        EditorGUILayout.PropertyField(criticalDamageText);
+        EditorGUILayout.PropertyField(weaponAccuracyText);
+        EditorGUILayout.PropertyField(movementSpeedText);
+        EditorGUILayout.PropertyField(numberOfBulletText);
     }
 }

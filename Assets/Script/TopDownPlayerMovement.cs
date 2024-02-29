@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 {
@@ -9,11 +10,12 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     [SerializeField] Transform cam, camFollowPos;
     [SerializeField] Camera mainCam;
     [SerializeField] Vector3 offset;
-    [SerializeField] PickUp pickUp;
-    [SerializeField] LayerMask weaponMask, buffMask;
+    public PickUp pickUp;
+    [SerializeField] LayerMask weaponMask, buffMask, itemMask;
     [SerializeField] float pickUpRadius;
     [SerializeField] BoxCollider2D boxCollider;
-    [SerializeField] Transform gunPos, buffPos;
+    public Transform gunPos, buffPos;
+    public Transform itemPos;
     [SerializeField] Animator animator;
     [SerializeField] Rigidbody2D rb;
     [SerializeField] float speed;
@@ -28,14 +30,21 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     [SerializeField] float magnitude;
 
     [SerializeField] Slider healthSlider, armourSlider, energySlider;
-    float health, armour, energy;
-    [SerializeField] float maxHealth, maxArmour, maxEnergy;
-    [SerializeField] float regenerateArmourRate, regenerateEnegeyRate;
-    [SerializeField] GameObject weaponStatCanvas;
+    int health, armour;
+    public int energy { get; set; }
+    public int coin { get; set; } = 0;
+    [SerializeField] int maxHealth, maxArmour, maxEnergy;
+    [SerializeField] float regenerateArmourRate, regenerateEnegeyRate, regenerateHealthRate;
+    [SerializeField] GameObject weaponStatCanvas, buffDescCanvas;
+    [SerializeField] GameObject startNewWaveTxt;
     [SerializeField] Text weaponDmg, weaponRoF, weaponEnergyConsume, weaponCriticalHit, weaponAccuracy;
+    [SerializeField] TextMeshProUGUI buffDesc;
 
-    public Text healthText, armourText, energyText;
+    public Text healthText, armourText, energyText, coinText;
 
+    public GameObject buffStatPanel;
+    public TextMeshProUGUI maxHealthText, maxArmourText, maxEnergyText, weaponDamageText, weaponRofText, criticalChanceText, criticalDamageText, weaponAccuracyText, movementSpeedText, numberOfBulletText;
+    int currentMaxHealth, currenMaxtArmour, currentMaxEnergy, currentSpeed, currentCriticalDamage;
 
     public int dmg { get; set; }
     public int numberOfBullet { get; set; }
@@ -44,12 +53,13 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     public float accuracy { get; set; }
     public float rateOfFire { get; set; }
     public bool canBounce { get; set; }
+    public bool allowHealthRegen { get; set; }
 
     Vector2 moveDirection, newFloatingTextPos;
     Material originalMat;
     bool m_FacingRight = true;
     float moveX, moveY;
-    Collider2D weaponCollider, buffCollider;
+    Collider2D weaponCollider, buffCollider, itemCollider;
     float energyDeductionRate;
     // for camera shake
     float fadeElapsed = 0f;
@@ -83,10 +93,26 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
         armourText.text = $"{armour} / {maxArmour}";
         energyText.text = $"{energy} / {maxEnergy}";
 
+        coinText.text = coin.ToString();
+
+        maxHealthText.text = $"+{currentMaxHealth}";
+        maxArmourText.text = $"+{currenMaxtArmour}";
+        maxEnergyText.text = $"+{currentMaxEnergy}";
+        weaponDamageText.text = $"+{dmg}";
+        weaponRofText.text = $"+{rateOfFire}";
+        criticalChanceText.text = $"+{criticalChance}";
+        criticalDamageText.text = $"+{currentCriticalDamage}";
+        weaponAccuracyText.text = $"+{accuracy}";
+        movementSpeedText.text = $"+{currentSpeed}";
+        numberOfBulletText.text = $"+{numberOfBullet}";
+
         weaponStatCanvas.SetActive(false);
+        buffStatPanel.SetActive(false);
+        buffDescCanvas.SetActive(false);
 
         InvokeRepeating("RegenerateArmor", 0f, regenerateArmourRate);
         InvokeRepeating("RegenerateEnergy", 0f, regenerateEnegeyRate);
+        InvokeRepeating("RegenerateHealth", 0f, regenerateHealthRate);
     }
     private void Update()
     {
@@ -108,6 +134,15 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     }
     void GetInput()
     {
+        if (Input.GetKey(KeyCode.B))
+        {
+            UpdateUi();
+            buffStatPanel.SetActive(true);
+        }
+        else
+        {
+            buffStatPanel.SetActive(false);
+        }
         if (Input.GetKeyDown(KeyCode.T))
         {
             pickUp.DropWeapon();
@@ -199,8 +234,15 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 
     void PickUpAndDropItem()
     {
+        GameManager.instance.DisableAllItemCanvas();
+        GameManager.instance.DisableRefreshItemCanvas();
+        GameManager.instance.DisableLockItemCanvas();
+        buffDescCanvas.SetActive(false);
+        startNewWaveTxt.SetActive(false);
+
         weaponCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, weaponMask);
-        buffCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, buffMask);
+        itemCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, itemMask);
+        //buffCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, buffMask);
         if (weaponCollider)
         {
             weaponDmg.text = weaponCollider.gameObject.GetComponent<Gun>().Damage;
@@ -224,70 +266,120 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             weaponStatCanvas.SetActive(false);
         }
 
-        if (buffCollider)
+        if (itemCollider)
         {
-            switch (buffCollider.gameObject.tag)
+            switch (itemCollider.gameObject.tag)
             {
-                case "Buff":
-                    Buff buff = weaponCollider.gameObject.GetComponent<Buff>();
-                    if (Input.GetKeyDown(KeyCode.X))
+                case "StartNewWave":
+                    startNewWaveTxt.SetActive(true);
+                    if (Input.GetKeyDown(KeyCode.Return))
                     {
-                        switch (buff.buffType)
-                        {
-                            case Buff.BuffType.MoreHealth:
-                                SetMaxHealth(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreEnergy:
-                                SetMaxEnergy(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreArmour:
-                                SetMaxArmour(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreSpeed:
-                                SetSpeed(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreWeaponDmg:
-                                SetDmg(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreBulletForShotgun:
-                                SetNumberOfBullet(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreWeaponRoF:
-                                SetRoF();
-                                break;
-                            case Buff.BuffType.MoreWeaponAccuracy:
-                                SetAccuracy();
-                                break;
-                            case Buff.BuffType.MoreWeaponCriticalChance:
-                                SetCriticalChance(buff.buffAmount);
-                                break;
-                            case Buff.BuffType.MoreCriticalDmgMultiplier:
-                                SetCriticalDmgMultiplier();
-                                break;
-                            case Buff.BuffType.CanBounce:
-                                SetCanBounce(true);
-                                break;
-                        }
-                        weaponCollider.gameObject.transform.parent = buffPos;
-                        weaponCollider.gameObject.transform.localPosition = Vector3.zero;
-                        StartCoroutine(weaponCollider.gameObject.GetComponent<Buff>().BuffPickUpEffect());
-                        if (pickUp.GetCurrentWeapon() != null)
-                        {
-                            pickUp.GetCurrentWeapon().GetComponent<Gun>().ApplyBuff();
-                        }
-
+                        startNewWaveTxt.SetActive(false);
+                        GameManager.instance.SetNewWaveStart(true);
                     }
                     break;
-
                 case "RefreshItemCube":
+                    GameManager.instance.ActiveRefreshItemCanvas();
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
                         GameManager.instance.RefreshNewItem();
                     }
                     break;
+                case "LockItemCube":
+                    GameManager.instance.ActiveLockItemCanvas();
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        GameManager.instance.LockItem();
+                        Debug.Log(GameManager.instance.lockedItemList.Count);
+                    }
+                    break;
+                case "Coin":
+                    itemCollider.gameObject.GetComponent<HomingMissle>().enabled = true;
+                    break;
+                case "ItemPos":
+                    itemCollider.gameObject.GetComponent<Item>().itemCanvas.SetActive(true);
+
+                    switch (itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().itemType)
+                    {
+                        case ItemStat.ItemType.Buff:
+                            buffDesc.text = itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().itemDescription;
+                            buffDescCanvas.SetActive(true);
+                            Buff buff = itemCollider.gameObject.GetComponent<Item>().item.GetComponent<Buff>();
+                            if (Input.GetKeyDown(KeyCode.X) && coin >= itemCollider.gameObject.GetComponent<Item>().price)
+                            {
+                                Debug.Log(itemCollider.GetComponent<Item>().itemIndex);
+                                GameManager.instance.spawnedItems.Remove(itemCollider.GetComponent<Item>().item);
+                                switch (buff.buffType)
+                                {
+                                    case Buff.BuffType.MoreHealth:
+                                        SetMaxHealth(buff.buffAmount);
+                                        break;
+                                    case Buff.BuffType.MoreEnergy:
+                                        SetMaxEnergy(buff.buffAmount);
+                                        break;
+                                    case Buff.BuffType.MoreArmour:
+                                        SetMaxArmour(buff.buffAmount);
+                                        break;
+                                    case Buff.BuffType.MoreSpeed:
+                                        SetSpeed(buff.buffAmount);
+                                        break;
+                                    case Buff.BuffType.MoreWeaponDmg:
+                                        dmg += buff.buffAmount;
+                                        break;
+                                    case Buff.BuffType.MoreBulletForShotgun:
+                                        SetNumberOfBullet(buff.buffAmount);
+                                        break;
+                                    case Buff.BuffType.MoreWeaponRoF:
+                                        SetRoF();
+                                        break;
+                                    case Buff.BuffType.MoreWeaponAccuracy:
+                                        SetAccuracy();
+                                        break;
+                                    case Buff.BuffType.MoreWeaponCriticalChance:
+                                        SetCriticalChance(buff.buffAmount);
+                                        break;
+                                    case Buff.BuffType.MoreCriticalDmgMultiplier:
+                                        SetCriticalDmgMultiplier();
+                                        break;
+                                    case Buff.BuffType.CanBounce:
+                                        SetCanBounce(true);
+                                        break;
+                                    case Buff.BuffType.AllowHealthRegen:
+                                        allowHealthRegen = true;
+                                        break;
+                                }
+                                buff.gameObject.transform.parent = buffPos;
+                                buff.gameObject.transform.localPosition = Vector3.zero;
+                                StartCoroutine(buff.BuffPickUpEffect());
+                                if (pickUp.GetCurrentWeapon() != null)
+                                {
+                                    pickUp.GetCurrentWeapon().gameObject.GetComponent<Gun>().ApplyBuff();
+                                }
+                                Debug.Log("buy item");
+                                Debug.Log(itemCollider.gameObject.GetComponent<Item>().price);
+                                coin -= itemCollider.gameObject.GetComponent<Item>().price;
+                                UpdateUi();
+                                itemCollider.gameObject.GetComponent<Item>().bc2d.enabled = false;
+                            }
+                            break;
+                        case ItemStat.ItemType.Weapon:
+                            if (Input.GetKeyDown(KeyCode.X) && coin >= itemCollider.gameObject.GetComponent<Item>().price)
+                            {
+                                GameManager.instance.spawnedItems.Remove(itemCollider.GetComponent<Item>().item);
+                                Debug.Log("buy item");
+                                Debug.Log(itemCollider.gameObject.GetComponent<Item>().price);
+                                coin -= itemCollider.gameObject.GetComponent<Item>().price;
+                                UpdateUi();
+                                itemCollider.gameObject.GetComponent<Item>().bc2d.enabled = false;
+                            }
+                            break;
+                    }
+
+                    break;
             }
 
         }
+
     }
 
     public void OnDrawGizmos()
@@ -298,12 +390,17 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 
     public void TakeDamage(int dmg)
     {
+        int currentArmour = armour;
+        if (dmg <= 0)
+        {
+            return;
+        }
         armour -= dmg;
         ShowDamage(dmg);
         if (armour <= 0)
         {
             armour = 0;
-            health -= dmg;
+            health -= (dmg - currentArmour);
             if (health <= 0)
             {
                 health = 0;
@@ -348,9 +445,22 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             UpdateUi();
         }
     }
+    void RegenerateHealth()
+    {
+        if (health < (int)(maxHealth / 2) && allowHealthRegen)
+        {
+            health++;
+            UpdateUi();
+        }
+    }
 
     public void ConsumeEnergy()
     {
+        if (energy <= 0)
+        {
+            energy = 0;
+            UpdateUi();
+        }
         if (pickUp.GetCurrentWeapon() == null)
         {
             return;
@@ -390,22 +500,37 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
         healthText.text = $"{health} / {maxHealth}";
         armourText.text = $"{armour} / {maxArmour}";
         energyText.text = $"{energy} / {maxEnergy}";
+        coinText.text = coin.ToString();
+
+        maxHealthText.text = $"+{currentMaxHealth}";
+        maxArmourText.text = $"+{currenMaxtArmour}";
+        maxEnergyText.text = $"+{currentMaxEnergy}";
+        weaponDamageText.text = $"+{dmg}";
+        weaponRofText.text = $"+{rateOfFire}";
+        criticalChanceText.text = $"+{criticalChance}";
+        criticalDamageText.text = $"+{currentCriticalDamage}";
+        weaponAccuracyText.text = $"+{accuracy}";
+        movementSpeedText.text = $"+{currentSpeed}";
+        numberOfBulletText.text = $"+{numberOfBullet}";
     }
 
     public void SetMaxHealth(int moreHealth)
     {
+        currentMaxHealth += moreHealth;
         maxHealth += moreHealth;
         healthSlider.maxValue = maxHealth;
         healthText.text = $"{health} / {maxHealth}";
     }
     public void SetMaxArmour(int moreArmour)
     {
+        currenMaxtArmour += moreArmour;
         maxArmour += moreArmour;
         armourSlider.maxValue = maxArmour;
         armourText.text = $"{armour} / {maxArmour}";
     }
     public void SetMaxEnergy(int moreEnergy)
     {
+        currentMaxEnergy += moreEnergy;
         maxEnergy += moreEnergy;
         energySlider.maxValue = maxEnergy;
         energyText.text = $"{energy} / {maxEnergy}";
@@ -421,6 +546,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 
     public void SetSpeed(int moreSpeed)
     {
+        currentSpeed += moreSpeed;
         speed += moreSpeed;
     }
 
@@ -454,18 +580,30 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     }
     public void SetCriticalDmgMultiplier()
     {
+        currentCriticalDamage += 2;
         criticalDmgMultiplier *= 2;
     }
     public void SetCanBounce(bool ableToBounce)
     {
         canBounce = ableToBounce;
     }
+
+    public void AddMoreEnergy(int amount)
+    {
+        if (energy >= maxEnergy)
+        {
+            return;
+        }
+        energy += amount;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
     }
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
+
     }
+
 
 }

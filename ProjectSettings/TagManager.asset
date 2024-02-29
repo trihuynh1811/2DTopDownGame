@@ -12,6 +12,8 @@ TagManager:
   - ItemPos
   - RefreshItemCube
   - LockItemCube
+  - Coin
+  - StartNewWave
   layers:
   - Default
   - TransparentFX
@@ -24,7 +26,7 @@ TagManager:
   - Bullet
   - Weapon
   - Object
-  - 
+  - Buff
   - 
   - 
   - 

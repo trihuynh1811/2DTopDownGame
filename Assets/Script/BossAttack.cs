@@ -6,8 +6,25 @@ public class BossAttack : MonoBehaviour
 {
     public enum Boss
     {
+        Crab,
         MechaGolem
     }
+    [SerializeField] Boss bossType;
+
+    [SerializeField] EnemyTakeDmg enemyTakeDmg;
+
+    [SerializeField] Transform firePoint, gunHolderPos;
+    [SerializeField] GameObject bullet, gatling, flamethrower, missleLauncher;
+    [SerializeField] int bulletDamage, flameDamage;
+    [SerializeField] float gunHolderRotateSpeed, fireRate, flameFireRate, spreadAngle, numberOfBullet, maxBulletSpeed, minBulletSpeed;
+    [SerializeField] List<ParticleSystem> flameParticle;
+    [SerializeField] FlameDetectPlayer flameDetectPlayer;
+    [SerializeField] float minXpos, maxXpos, minYpos, maxYpos, missleSpeed, timeBtwLaunchingMissile;
+    [SerializeField] int maxNumberMissle, minNumberMissle;
+    [SerializeField] GameObject missleIndicator, missle, missleSpawnPoint;
+    float currentFireRate, spread, currentBulletSpeed;
+    Vector2 rotateDirection;
+
     [SerializeField] float rotation, numberOfShootPoint, radiusMultiplier;
     [SerializeField] List<Transform> shootPointList;
 
@@ -17,6 +34,17 @@ public class BossAttack : MonoBehaviour
     [SerializeField] int laserDmg;
     [SerializeField] LayerMask hitMask;
     float currentRotateTime, currentDamageRate, currentRandomLaserTime;
+    Transform player;
+
+    [SerializeField] bool useEffectWhenDie;
+    [SerializeField] GameObject deathEffect;
+    [SerializeField] int explosionDmg;
+    [SerializeField] float explosionForce, explosionTime, splashRadius;
+
+    private void Awake()
+    {
+        player = GameObject.Find("Player").transform;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -32,17 +60,39 @@ public class BossAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //RotateRing();
-        //if (currentDamageRate > 0) currentDamageRate -= Time.deltaTime;
-        if(currentRandomLaserTime > 0)
+        if (enemyTakeDmg.health <= 0)
         {
-            ActivateLaserRandomly();
+            enemyTakeDmg.health = 0;
+            this.enabled = false;
         }
-        currentRandomLaserTime -= Time.deltaTime;
-        if(currentRandomLaserTime <= 0)
+
+        switch (bossType)
         {
-            currentRandomLaserTime = 0;
+
+            case Boss.MechaGolem:
+                //RotateRing();
+                //if (currentDamageRate > 0) currentDamageRate -= Time.deltaTime;
+                if (currentRandomLaserTime > 0)
+                {
+                    ActivateLaserRandomly();
+                }
+                currentRandomLaserTime -= Time.deltaTime;
+                if (currentRandomLaserTime <= 0)
+                {
+                    currentRandomLaserTime = 0;
+                }
+                break;
+            case Boss.Crab:
+                RotateGunTowardPlayer();
+                if (currentFireRate <= 0)
+                {
+                    ShootPlayer();
+                }
+                if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
+                break;
+
         }
+
     }
 
     void RotateRing()
@@ -113,6 +163,106 @@ public class BossAttack : MonoBehaviour
         int randomShootpointIndex = Random.Range(1, shootPointList.Count);
         shootPointList[randomShootpointIndex].gameObject.SetActive(true);
         StartCoroutine(ActivateSingleLaser(randomShootpointIndex));
+    }
+
+    void RotateGunTowardPlayer()
+    {
+        Vector3 differance = player.transform.position - gunHolderPos.position;
+        float rotZ = Mathf.Atan2(differance.y, differance.x) * Mathf.Rad2Deg;
+        Quaternion targetQuaternion = Quaternion.Euler(0f, 0f, rotZ);
+        if (rotZ < -90 || rotZ > 90)
+        {
+            targetQuaternion = Quaternion.Euler(180f, 0, -rotZ);
+        }
+
+        // Rotate towards the target rotation
+        gunHolderPos.rotation = Quaternion.RotateTowards(gunHolderPos.rotation, targetQuaternion, gunHolderRotateSpeed * Time.deltaTime);
+    }
+
+    void ShootPlayer()
+    {
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 75) / 100) && enemyTakeDmg.health <= enemyTakeDmg.maxHealth)
+        {
+            currentFireRate = fireRate;
+            for (int i = 0; i < numberOfBullet; i++)
+            {
+                spread = Random.Range(-spreadAngle, spreadAngle);
+                currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
+                Vector2 direction = Quaternion.Euler(0, 0, spread) * firePoint.right;
+                //GameObject bulletClone = Instantiate(bullet, firePoint.position, firePoint.rotation);
+                GameObject bulletClone = ObjectPoolManager.SpawnObject(bullet, firePoint.position, firePoint.rotation, ObjectPoolManager.PoolType.GameObject);
+                bulletClone.GetComponent<Bullet>().SetDmg(bulletDamage);
+                bulletClone.transform.right = direction.normalized;
+                bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
+            }
+        }
+        else
+        {
+            if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 50) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 75) / 100))
+            {
+                gatling.SetActive(false);
+                flamethrower.SetActive(true);
+                for (int i = 0; i < flameParticle.Count; i++)
+                {
+                    flameParticle[i].Play();
+                }
+                if (currentFireRate <= 0)
+                {
+                    Debug.Log("deal damage to player");
+                    flameDetectPlayer.damge = flameDamage;
+                    flameDetectPlayer.damageRate = currentFireRate;
+                    currentFireRate = flameFireRate;
+                }
+                else
+                {
+                    Debug.Log("Do nothing");
+                    flameDetectPlayer.damge = 0;
+                    flameDetectPlayer.damageRate = flameFireRate;
+                }
+            }
+            if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100))
+            {
+                gatling.SetActive(false);
+                flamethrower.SetActive(false);
+                missleLauncher.SetActive(true);
+
+                int numberMissile = Random.Range(minNumberMissle, maxNumberMissle);
+                if(currentFireRate <= 0)
+                {
+                    for (int i = 0; i < numberMissile; i++)
+                    {
+                        Vector2 missleIndicatorPos = (Vector2)player.position + new Vector2(Random.Range(-10, 10), Random.Range(-10, 10));
+                        missleIndicatorPos.x = missleIndicatorPos.x > maxXpos ? maxXpos : missleIndicatorPos.x < minXpos ? minXpos : missleIndicatorPos.x;
+                        missleIndicatorPos.y = missleIndicatorPos.y > maxYpos ? maxXpos : missleIndicatorPos.y < minYpos ? minYpos : missleIndicatorPos.y;
+                        StartCoroutine(LaunchMissle(missleIndicatorPos));
+                    }
+                    currentFireRate = timeBtwLaunchingMissile;
+                }
+            }
+        }
+
+    }
+
+    public void Explode()
+    {
+        Instantiate(deathEffect, transform.position, Quaternion.identity);
+        if ((int)Vector2.Distance(transform.position, player.transform.position) <= splashRadius)
+        {
+            Vector2 explosionVector = (player.GetComponent<Rigidbody2D>().transform.position - transform.position).normalized;
+            TopDownPlayerMovement.instance.explosionForce = new Vector2(explosionVector.x * explosionForce, explosionVector.y * explosionForce);
+            TopDownPlayerMovement.instance.explosionTime = explosionTime;
+            TopDownPlayerMovement.instance.fadeDuration = explosionTime;
+            TopDownPlayerMovement.instance.TakeDamage(explosionDmg);
+        }
+        gameObject.SetActive(false);
+    }
+
+    IEnumerator LaunchMissle(Vector2 missleIndicatorPos)
+    {
+        yield return new WaitForSeconds(1f);
+        GameObject missleClone = ObjectPoolManager.SpawnObject(missle, missleSpawnPoint.transform.position, Quaternion.identity, ObjectPoolManager.PoolType.GameObject);
+        missleClone.GetComponent<Rigidbody2D>().AddForce(missleSpawnPoint.transform.up.normalized * missleSpeed);
+        ObjectPoolManager.SpawnObject(missleIndicator, missleIndicatorPos, Quaternion.identity, ObjectPoolManager.PoolType.GameObject);
     }
 
     // this function is for inspector button click event

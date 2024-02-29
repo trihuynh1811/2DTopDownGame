@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 210020948619902384}
   - component: {fileID: 2861962720694354130}
   - component: {fileID: 5895001676184934837}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: MoreBulletForShotgunBuff
   m_TagString: Buff
   m_Icon: {fileID: 0}
@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4d827a9231f5644e94bd7b957f2c3c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buffType: 0
+  buffType: 8
   buffAmount: 2
 --- !u!50 &2861962720694354130
 Rigidbody2D:
@@ -256,7 +256,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 2
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -274,7 +274,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 1
   itemName: More Bullet For Shotgun
-  price: 0
+  price: 10
   dropChance: 0
   itemDescription: Shotgun pellet +2
 --- !u!1 &7134533828746617441

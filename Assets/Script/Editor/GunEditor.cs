@@ -11,6 +11,7 @@ public class GunEditor : Editor
     SerializedProperty laserStart, laserEnd;
 
     SerializedProperty flameParticle;
+    SerializedProperty flameDetectPlayer;
 
     SerializedProperty laserHitMask;
     SerializedProperty rayCastLength;
@@ -37,6 +38,7 @@ public class GunEditor : Editor
         laserEnd = serializedObject.FindProperty("laserEnd");
 
         flameParticle = serializedObject.FindProperty("flameParticle");
+        flameDetectPlayer = serializedObject.FindProperty("flameDetectPlayer");
 
         laserHitMask = serializedObject.FindProperty("laserHitMask");
         rayCastLength = serializedObject.FindProperty("rayCastLength");
@@ -104,6 +106,7 @@ public class GunEditor : Editor
 
     public void displaySettingForFlameThrower()
     {
+        EditorGUILayout.PropertyField(flameDetectPlayer);
         EditorGUILayout.PropertyField(flameParticle);
         EditorGUILayout.PropertyField(laserHitMask);
         EditorGUILayout.PropertyField(rayCastLength);

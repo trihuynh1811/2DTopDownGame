@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 
-[RequireComponent(typeof(EnemyAttack), typeof(EnemyTakeDmg))]
 public class EnemyChasePlayerTest : MonoBehaviour
 {
-    [SerializeField] EnemyAttack attack;
+    [SerializeField] EnemyAttack enemyAttack;
+    [SerializeField] BossAttack bossAttack;
     [SerializeField] EnemyTakeDmg takeDmg;
 
     [SerializeField] float transformRotationSpeed, followRange, attackRange;
     [SerializeField] Animator animator;
-    [SerializeField] AnimationClip deadAnimation;
+    [SerializeField] AnimationClip deadAnimation, idleAnimation, walkAnimation;
     [SerializeField] Collider2D c2d;
     [SerializeField] bool rotateX, rotateY, rotateZ, homingLikeRotate, explodeWhenDie;
 
@@ -22,6 +22,9 @@ public class EnemyChasePlayerTest : MonoBehaviour
     public Rigidbody2D rb;
     public Seeker seeker;
     public float nextWayPointDistance;
+    [SerializeField] int numberOfItemToSpawn;
+    [SerializeField] List<GameObject> itemList;
+    [SerializeField] Vector2 randomItemPos;
 
     Path path;
     int currentWayPoint;
@@ -116,20 +119,26 @@ public class EnemyChasePlayerTest : MonoBehaviour
         if (distanceToPlayer > followRange)
         {
             currentSpeed = 0;
+            if (idleAnimation != null)
+                animator.Play(idleAnimation.name);
         }
         else
         {
             if (distanceToPlayer <= attackRange)
             {
                 currentSpeed = 0;
-                if (attack != null)
-                    attack.Attack();
+                if (idleAnimation != null)
+                    animator.Play(idleAnimation.name);
+                if (enemyAttack != null)
+                    enemyAttack.Attack();
             }
             else
             {
+                if (idleAnimation != null)
+                    animator.Play(walkAnimation.name);
+                if (enemyAttack != null)
+                    enemyAttack.DisableAttack();
                 currentSpeed = speed;
-                if (attack != null)
-                    attack.DisableAttack();
             }
         }
 
@@ -180,11 +189,32 @@ public class EnemyChasePlayerTest : MonoBehaviour
     {
         if (animator != null)
         {
-            animator.Play(deadAnimation.name);
+            if (deadAnimation != null)
+            {
+                animator.Play(deadAnimation.name);
+            }
         }
         if (explodeWhenDie)
         {
-            attack.Explode();
+            if(enemyAttack != null)
+            {
+                enemyAttack.Explode();
+            }
+            if(bossAttack != null)
+            {
+                bossAttack.Explode();
+            }
+        }
+        if(GameManager.instance.time > 0)
+        {
+            int randomAmount = Random.Range(1, numberOfItemToSpawn + 1);
+            for (int i = 0; i < randomAmount; i++)
+            {
+                int randomIndex = Random.Range(0, itemList.Count);
+                Vector2 randomPos = new(transform.position.x + Random.Range(-randomItemPos.x, randomItemPos.x), transform.position.y + Random.Range(-randomItemPos.y, randomItemPos.y));
+                GameObject item = Instantiate(itemList[randomIndex], randomPos, Quaternion.identity);
+                GameManager.itemList.Add(item);
+            }
         }
         c2d.enabled = false;
         rb.freezeRotation = true;

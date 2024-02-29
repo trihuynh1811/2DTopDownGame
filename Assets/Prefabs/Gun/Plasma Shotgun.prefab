@@ -196,14 +196,11 @@ MonoBehaviour:
   laser: {fileID: 0}
   laserStart: {fileID: 0}
   laserEnd: {fileID: 0}
-  hitEnemyLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  hitObjectLayerMask:
+  laserHitMask:
     serializedVersion: 2
     m_Bits: 0
   rayCastLength: 0
-  damage: 3
+  damage: 5
   criticalHitChance: 15
   energyConsume: 6
   gunSprite: {fileID: 3782254102431484848}
@@ -272,6 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemType: 0
   itemName: Plasma Shotgun
   price: 50
   dropChance: 0

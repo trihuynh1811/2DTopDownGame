@@ -8,35 +8,69 @@ public class EnemyTakeDmg : MonoBehaviour, ITakeDamage
     [SerializeField] Transform floatingTextPos;
     [SerializeField] Vector2 randomFloatingTextPos;
     public int health;
+    [SerializeField] bool multipleEnemySpriteList;
+    [SerializeField] List<SpriteRenderer> enemySpriteList;
     [SerializeField] SpriteRenderer enemySprite;
     [SerializeField] Material hurtMat;
     Material originalMat;
+    List<Material> originMatList = new List<Material>();
     [SerializeField] float flashDuration;
     float currentFlashDuration;
+    public int maxHealth { get; set; }
     Vector2 newFloatingTextPos;
 
-    private void Awake()
+    private void Start()
     {
-        originalMat = enemySprite.material;
+        maxHealth = health;
+        if (multipleEnemySpriteList)
+        {
+            for (int i = 0; i < enemySpriteList.Count; i++)
+            {
+                originMatList.Add(enemySpriteList[i].material);
+            }
+        }
+        else
+        {
+            originalMat = enemySprite.material;
+        }
         currentFlashDuration = flashDuration;
 
     }
     public void TakeDamage(int dmg)
     {
-        if(floatingText != null)
+        if (floatingText != null)
         {
             ShowDamage(dmg);
         }
         health -= dmg;
         StartCoroutine(GetHit());
     }
-    
+
     IEnumerator GetHit()
     {
-        enemySprite.material = hurtMat;
+        if (multipleEnemySpriteList)
+        {
+            for (int i = 0; i < enemySpriteList.Count; i++)
+            {
+                enemySpriteList[i].material = hurtMat;
+            }
+        }
+        else
+        {
+            enemySprite.material = hurtMat;
+        }
         yield return new WaitForSeconds(flashDuration);
-        enemySprite.material = originalMat;
-
+        if (multipleEnemySpriteList)
+        {
+            for (int i = 0; i < enemySpriteList.Count; i++)
+            {
+                enemySpriteList[i].material = originMatList[i];
+            }
+        }
+        else
+        {
+            enemySprite.material = originalMat;
+        }
     }
 
     void ShowDamage(float dmg)

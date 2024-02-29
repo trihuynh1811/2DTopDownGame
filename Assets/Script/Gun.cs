@@ -14,6 +14,7 @@ public class Gun : MonoBehaviour
     public GunType gunType;
     // Variable for flamethrower
     [SerializeField] List<ParticleSystem> flameParticle;
+    [SerializeField] FlameDetectPlayer flameDetectPlayer;
 
     // Variable for laser
     [SerializeField] LineRenderer laser;
@@ -133,6 +134,12 @@ public class Gun : MonoBehaviour
         switch (gunType)
         {
             case GunType.NormalGun:
+                if (TopDownPlayerMovement.instance.energy <= 0)
+                {
+                    TopDownPlayerMovement.instance.energy = 0;
+                    TopDownPlayerMovement.instance.UpdateUi();
+                    return;
+                }
                 currentFireRate = fireRate - (fireRate * TopDownPlayerMovement.instance.rateOfFire);
                 for (int i = 0; i < currentNumberOfBullet; i++)
                 {
@@ -149,22 +156,43 @@ public class Gun : MonoBehaviour
                 }
                 break;
             case GunType.Flamethrower:
+                if (TopDownPlayerMovement.instance.energy <= 0)
+                {
+                    TopDownPlayerMovement.instance.energy = 0;
+                    TopDownPlayerMovement.instance.UpdateUi();
+                    for (int i = 0; i < flameParticle.Count; i++)
+                    {
+                        flameParticle[i].Stop();
+                    }
+                    return;
+                }
                 for (int i = 0; i < flameParticle.Count; i++)
                 {
                     flameParticle[i].Play();
                 }
-                hit = Physics2D.Raycast(firePoint.position, firePoint.right, currentRayCastLength, laserHitMask);
-                if (hit)
+                if (currentFireRate <= 0)
                 {
-                    if (hit.collider.gameObject.CompareTag("Enemy") && currentFireRate <= 0)
-                    {
-                        hit.collider.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(currentDamage);
-                        currentFireRate = fireRate;
-                    }
+                    flameDetectPlayer.damge = damage;
+                    flameDetectPlayer.damageRate = currentFireRate;
+                    currentFireRate = fireRate;
+                }
+                else
+                {
+                    flameDetectPlayer.damge = 0;
+                    flameDetectPlayer.damageRate = fireRate;
                 }
 
                 break;
             case GunType.LaserGun:
+                if (TopDownPlayerMovement.instance.energy <= 0)
+                {
+                    TopDownPlayerMovement.instance.energy = 0;
+                    TopDownPlayerMovement.instance.UpdateUi();
+                    laserStart.SetActive(false);
+                    laser.SetPosition(1, new Vector2(0, 0));
+                    laserEnd.SetActive(false);
+                    return;
+                }
                 laserStart.SetActive(true);
                 hit = Physics2D.Raycast(firePoint.position, firePoint.right, rayCastLength, laserHitMask);
                 if (hit)
@@ -207,22 +235,32 @@ public class Gun : MonoBehaviour
     {
         if (currentSpreadAngle <= 0)
         {
-            Debug.Log("currentSpreadAngle <= 0");
             currentSpreadAngle = 0.01f;
-            return;
         }
 
         if (currentNumberOfBullet != numberOfBullet + TopDownPlayerMovement.instance.numberOfBullet && isShotGun)
         {
             currentNumberOfBullet = numberOfBullet + TopDownPlayerMovement.instance.numberOfBullet;
         }
+
         if (currentSpreadAngle != spreadAngle - (spreadAngle * TopDownPlayerMovement.instance.accuracy))
         {
             currentSpreadAngle = spreadAngle - (spreadAngle * TopDownPlayerMovement.instance.accuracy);
         }
+
         if (currentCriticalChance != criticalHitChance + TopDownPlayerMovement.instance.criticalChance)
         {
             currentCriticalChance = criticalHitChance + TopDownPlayerMovement.instance.criticalChance;
+        }
+
+        if (currentDamage != damage + TopDownPlayerMovement.instance.dmg)
+        {
+            currentDamage = damage + TopDownPlayerMovement.instance.dmg;
+        }
+
+        if (currentRateOfFire != fireRate + TopDownPlayerMovement.instance.rateOfFire)
+        {
+            currentRateOfFire = fireRate + TopDownPlayerMovement.instance.rateOfFire;
         }
 
     }

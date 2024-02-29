@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 6146672986803675705}
   - component: {fileID: 5736192709640988597}
   - component: {fileID: 8159282366490035883}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: IncreaseDamageBuff
   m_TagString: Buff
   m_Icon: {fileID: 0}
@@ -230,7 +230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4d827a9231f5644e94bd7b957f2c3c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buffType: 0
+  buffType: 4
   buffAmount: 2
 --- !u!50 &5736192709640988597
 Rigidbody2D:
@@ -255,7 +255,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 2
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -273,6 +273,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 1
   itemName: More Damage
-  price: 0
+  price: 15
   dropChance: 0
   itemDescription: Weapon Damage +2

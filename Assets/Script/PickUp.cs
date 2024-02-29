@@ -23,7 +23,14 @@ public class PickUp : MonoBehaviour
     {
         if (weaponList.Count >= maxWeaponCanHold)
         {
-            DropWeapon();
+            currentWeapon.GetComponent<Gun>().enabled = false;
+            currentWeapon.transform.parent = dropWeaponPos;
+            currentWeapon.transform.position = dropWeaponPos.position;
+            currentWeapon.transform.rotation = dropWeaponPos.rotation;
+            currentWeapon.transform.parent = null;
+            currentWeapon.layer = 9;
+            weaponList.Remove(currentWeapon);
+            currentWeapon = null;
         }
         weapon.GetComponent<Gun>().enabled = true;
         weapon.transform.parent = weaponPos;

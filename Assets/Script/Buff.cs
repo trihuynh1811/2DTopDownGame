@@ -16,7 +16,8 @@ public class Buff : MonoBehaviour
         MoreWeaponCriticalChance,
         MoreBulletForShotgun,
         MoreCriticalDmgMultiplier,
-        CanBounce
+        CanBounce,
+        AllowHealthRegen
     }
 
     Vector2 originalScale;

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 82559078005840941}
   - component: {fileID: 8820258371344139443}
   - component: {fileID: 4853801860170123726}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: IncreaseMovementSpeedBuff
   m_TagString: Buff
   m_Icon: {fileID: 0}
@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4d827a9231f5644e94bd7b957f2c3c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buffType: 0
+  buffType: 3
   buffAmount: 2
 --- !u!50 &8820258371344139443
 Rigidbody2D:
@@ -171,7 +171,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 2
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -189,7 +189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 1
   itemName: Move Faster
-  price: 0
+  price: 5
   dropChance: 0
   itemDescription: Movement speed +2
 --- !u!1 &6977298252258986760
