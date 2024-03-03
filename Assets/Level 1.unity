@@ -419,9 +419,9 @@ MonoBehaviour:
   minYpos: -14.02
   maxYpos: 18
   missleSpeed: 800
-  timeBtwLaunchingMissile: 5
-  maxNumberMissle: 7
-  minNumberMissle: 5
+  timeBtwLaunchingMissile: 15
+  maxNumberMissle: 20
+  minNumberMissle: 10
   missleIndicator: {fileID: 7664929049890703690, guid: 890d609687639314eba6e02aa9af6905, type: 3}
   missle: {fileID: 1185568943521917656, guid: 679fb2515c92e7247966dd914ceb236a, type: 3}
   missleSpawnPoint: {fileID: 635675815}
@@ -36497,7 +36497,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1343984162196574530, guid: 942d17d97b32efb47b56c55a5e3ff766, type: 3}
       propertyPath: attackType
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5462947570905477240, guid: 942d17d97b32efb47b56c55a5e3ff766, type: 3}
       propertyPath: m_Name

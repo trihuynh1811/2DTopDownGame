@@ -11,11 +11,13 @@ public class ObjectPoolManager : MonoBehaviour
 
     static GameObject _gameObjectEmpty;
     static GameObject _UiEmpty;
+    static GameObject _particleEmpty;
 
     public enum PoolType
     {
         GameObject,
         UI,
+        ParticleSystem,
         None
     }
     public static PoolType PoolingType;
@@ -34,6 +36,9 @@ public class ObjectPoolManager : MonoBehaviour
 
         _UiEmpty = new GameObject("UI");
         _UiEmpty.transform.SetParent(_objectPoolEmptyHolder.transform);
+
+        _particleEmpty = new GameObject("ParticleSystem");
+        _particleEmpty.transform.SetParent(_objectPoolEmptyHolder.transform);
     }
 
     public static GameObject SpawnObject(GameObject objectToSpawn, Vector3 spawanPosition, Quaternion spawnRotation, PoolType poolType = PoolType.None)
@@ -93,6 +98,8 @@ public class ObjectPoolManager : MonoBehaviour
                 return _gameObjectEmpty;
             case PoolType.UI:
                 return _UiEmpty;
+            case PoolType.ParticleSystem:
+                return _particleEmpty;
             case PoolType.None:
                 return null;
             default:

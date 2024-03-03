@@ -222,19 +222,18 @@ public class BossAttack : MonoBehaviour
             }
             if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100))
             {
-                gatling.SetActive(false);
-                flamethrower.SetActive(false);
                 missleLauncher.SetActive(true);
 
                 int numberMissile = Random.Range(minNumberMissle, maxNumberMissle);
+                Debug.Log(numberMissile);
                 if(currentFireRate <= 0)
                 {
                     for (int i = 0; i < numberMissile; i++)
                     {
-                        Vector2 missleIndicatorPos = (Vector2)player.position + new Vector2(Random.Range(-10, 10), Random.Range(-10, 10));
+                        Vector2 missleIndicatorPos = (Vector2)player.position + new Vector2(Random.Range(-35, 35), Random.Range(-15, 15));
                         missleIndicatorPos.x = missleIndicatorPos.x > maxXpos ? maxXpos : missleIndicatorPos.x < minXpos ? minXpos : missleIndicatorPos.x;
-                        missleIndicatorPos.y = missleIndicatorPos.y > maxYpos ? maxXpos : missleIndicatorPos.y < minYpos ? minYpos : missleIndicatorPos.y;
-                        StartCoroutine(LaunchMissle(missleIndicatorPos));
+                        missleIndicatorPos.y = missleIndicatorPos.y > maxYpos ? maxYpos : missleIndicatorPos.y < minYpos ? minYpos : missleIndicatorPos.y;
+                        StartCoroutine(LaunchMissle(missleIndicatorPos, i));
                     }
                     currentFireRate = timeBtwLaunchingMissile;
                 }
@@ -257,12 +256,14 @@ public class BossAttack : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    IEnumerator LaunchMissle(Vector2 missleIndicatorPos)
+    IEnumerator LaunchMissle(Vector2 missleIndicatorPos, int index)
     {
         yield return new WaitForSeconds(1f);
         GameObject missleClone = ObjectPoolManager.SpawnObject(missle, missleSpawnPoint.transform.position, Quaternion.identity, ObjectPoolManager.PoolType.GameObject);
+        GameObject targetClone = ObjectPoolManager.SpawnObject(missleIndicator, missleIndicatorPos, Quaternion.identity, ObjectPoolManager.PoolType.GameObject);
+        targetClone.name = $"target_{index}";
         missleClone.GetComponent<Rigidbody2D>().AddForce(missleSpawnPoint.transform.up.normalized * missleSpeed);
-        ObjectPoolManager.SpawnObject(missleIndicator, missleIndicatorPos, Quaternion.identity, ObjectPoolManager.PoolType.GameObject);
+        missleClone.GetComponent<CrapHomingMissle>().target = targetClone.transform;
     }
 
     // this function is for inspector button click event
