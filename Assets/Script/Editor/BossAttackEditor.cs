@@ -34,6 +34,9 @@ public class BossAttackEditor : Editor
     SerializedProperty numberOfShootPoint;
     SerializedProperty radiusMultiplier;
     SerializedProperty shootPointList;
+
+    SerializedProperty animator;
+    SerializedProperty attackClip;
     SerializedProperty ring;
     SerializedProperty drone;
     SerializedProperty laserLines;
@@ -44,8 +47,10 @@ public class BossAttackEditor : Editor
     SerializedProperty laserLength;
     SerializedProperty damageRate;
     SerializedProperty randomLaserTime;
+    SerializedProperty shootFireBallRate;
     SerializedProperty laserDmg;
     SerializedProperty hitMask;
+
     SerializedProperty useEffectWhenDie;
     SerializedProperty deathEffect;
     SerializedProperty explosionDmg;
@@ -93,6 +98,8 @@ public class BossAttackEditor : Editor
         radiusMultiplier = serializedObject.FindProperty("radiusMultiplier");
         shootPointList = serializedObject.FindProperty("shootPointList");
 
+        animator = serializedObject.FindProperty("animator");
+        attackClip = serializedObject.FindProperty("attackClip");
         ring = serializedObject.FindProperty("ring");
         drone = serializedObject.FindProperty("drone");
         laserLines = serializedObject.FindProperty("laserLines");
@@ -103,6 +110,7 @@ public class BossAttackEditor : Editor
         laserLength = serializedObject.FindProperty("laserLength");
         damageRate = serializedObject.FindProperty("damageRate");
         randomLaserTime = serializedObject.FindProperty("randomLaserTime");
+        shootFireBallRate = serializedObject.FindProperty("shootFireBallRate");
         laserDmg = serializedObject.FindProperty("laserDmg");
         hitMask = serializedObject.FindProperty("hitMask");
 
@@ -156,6 +164,9 @@ public class BossAttackEditor : Editor
         EditorGUILayout.PropertyField(numberOfShootPoint);
         EditorGUILayout.PropertyField(radiusMultiplier);
         EditorGUILayout.PropertyField(shootPointList, true);
+
+        EditorGUILayout.PropertyField(animator);
+        EditorGUILayout.PropertyField(attackClip);
         EditorGUILayout.PropertyField(ring);
         EditorGUILayout.PropertyField(drone, true);
         EditorGUILayout.PropertyField(laserLines, true);
@@ -166,6 +177,7 @@ public class BossAttackEditor : Editor
         EditorGUILayout.PropertyField(laserLength);
         EditorGUILayout.PropertyField(damageRate);
         EditorGUILayout.PropertyField(randomLaserTime);
+        EditorGUILayout.PropertyField(shootFireBallRate);
         EditorGUILayout.PropertyField(laserDmg);
         EditorGUILayout.PropertyField(hitMask);
     }

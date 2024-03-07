@@ -278,7 +278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d22b53b50638b9f4e968285cc8edc619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyAttack: {fileID: 0}
+  enemyAttack: {fileID: 7460686389857807771}
   bossAttack: {fileID: 0}
   takeDmg: {fileID: 7938912414137237418}
   transformRotationSpeed: 100

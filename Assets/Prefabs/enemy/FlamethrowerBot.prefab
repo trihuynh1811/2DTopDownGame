@@ -10304,7 +10304,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d22b53b50638b9f4e968285cc8edc619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attack: {fileID: 1343984162196574530}
+  enemyAttack: {fileID: 1343984162196574530}
+  bossAttack: {fileID: 0}
   takeDmg: {fileID: 134829352489261258}
   transformRotationSpeed: 75
   followRange: 100

@@ -193,6 +193,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunType: 0
   flameParticle: []
+  flameDetectPlayer: {fileID: 0}
   laser: {fileID: 0}
   laserStart: {fileID: 0}
   laserEnd: {fileID: 0}
@@ -200,7 +201,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   rayCastLength: 0
-  damage: 5
+  damage: 3
   criticalHitChance: 15
   energyConsume: 6
   gunSprite: {fileID: 3782254102431484848}
@@ -271,6 +272,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   itemName: Plasma Shotgun
-  price: 50
+  price: 55
   dropChance: 0
   itemDescription: 

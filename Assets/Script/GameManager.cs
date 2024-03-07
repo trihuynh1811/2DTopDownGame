@@ -13,23 +13,26 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public int time;
     [SerializeField] GameObject triggerNewWaveObject, refreshItemCanvas, lockItemCanvas, waveCanvas;
     [SerializeField] int refreshItemPrice;
-    [SerializeField] Transform spawnedItemPos;
+    [SerializeField] Transform spawnedItemPos, bossSpawnPos;
 
     [SerializeField] float minSpawnX, maxSpawnX;
     [SerializeField] float minSpawnY, maxSpawnY;
+    [SerializeField] List<Vector2> maxXYPos;
+    [SerializeField] List<Vector2> minXYPos;
     [SerializeField] float spawnRate;
     [SerializeField] int numberOfMonsterPerSpawn, maxTime, maxWave, minSurvivalTime, maxSurvivalTime;
     [SerializeField] List<GameObject> monsterList;
     [SerializeField] GameObject spawnIndicator;
 
     [SerializeField] List<Transform> itemsPosList;
-    [SerializeField] List<GameObject> items;
+    [SerializeField] List<GameObject> items, maps, walls, bosses;
     [SerializeField] GameObject itemPosObject;
     public List<GameObject> currentItemList { get; set; }
 
     float currentSpawnRate, currentWaveCountDown = 3;
     float spawnX, spawnY;
-    int randomNumberOfMonsterToSpawn, wave = 1, currentRefreshItemPrice, numberOfRefreshTime = 1;
+    int randomNumberOfMonsterToSpawn, wave = 1, numberOfRefreshTime = 1;
+    public int currentRefreshItemPrice { get; set; }
     Vector2 newSpawnPoint;
     bool timerRunning = true, newWaveStart, allStatsDisabled;
     public static List<GameObject> spawnedMonsterList = new List<GameObject>();
@@ -52,6 +55,10 @@ public class GameManager : MonoBehaviour
             itemsPosList[i].GetComponent<Item>().itemIndex = i;
         }
         waveNumberText.text = wave.ToString();
+        maxSpawnX = maxXYPos[0].x;
+        maxSpawnY = maxXYPos[0].y;
+        minSpawnX = minXYPos[0].x;
+        minSpawnY = minXYPos[0].y;
     }
 
     // Start is called before the first frame update
@@ -148,7 +155,6 @@ public class GameManager : MonoBehaviour
                 if (lockedItemList.Count > 0)
                 {
                     itemsPosList.ForEach(x => x.gameObject.SetActive(false));
-                    spawnedItems = lockedItemList.ToList();
                     boxCollider2dList.ForEach(x => x.enabled = false);
                     Debug.Log("locked item list count: " + lockedItemList.Count);
                     for (int i = 0; i < lockedItemList.Count; i++)
@@ -170,6 +176,7 @@ public class GameManager : MonoBehaviour
                         boxCollider2dList[itemPosIndex].enabled = true;
                     }
                     itemPosObject.SetActive(true);
+                    spawnedItems = lockedItemList;
                     lockedItemList.Clear();
 
                 }
@@ -209,6 +216,19 @@ public class GameManager : MonoBehaviour
         waveCanvas.SetActive(true);
         yield return new WaitForSeconds(3f);
         waveCanvas.SetActive(false);
+        if(wave % 5 == 0)
+        {
+            maps.ForEach(map => map.SetActive(false));
+            walls.ForEach(wall => wall.SetActive(false));
+            int index = ((wave - 5) / 5) ;
+            maps[index].SetActive(true);
+            walls[index].SetActive(true);
+            maxSpawnX = maxXYPos[index].x;
+            maxSpawnY = maxXYPos[index].y;
+            minSpawnX = minXYPos[index].x;
+            minSpawnY = minXYPos[index].y;
+            Instantiate(bosses[index], bossSpawnPos.position, Quaternion.identity);
+        }
         timerRunning = true;
     }
 

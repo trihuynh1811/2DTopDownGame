@@ -280,7 +280,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
                     break;
                 case "RefreshItemCube":
                     GameManager.instance.ActiveRefreshItemCanvas();
-                    if (Input.GetKeyDown(KeyCode.Return))
+                    if (Input.GetKeyDown(KeyCode.Return) && coin >= GameManager.instance.currentRefreshItemPrice)
                     {
                         GameManager.instance.RefreshNewItem();
                     }
@@ -291,6 +291,12 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
                     {
                         GameManager.instance.LockItem();
                         Debug.Log(GameManager.instance.lockedItemList.Count);
+                    }
+                    break;
+                case "Crate":
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        itemCollider.gameObject.GetComponent<LootBox>().CrateOpen();
                     }
                     break;
                 case "Coin":

@@ -141,7 +141,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d22b53b50638b9f4e968285cc8edc619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attack: {fileID: 492438996999220560}
+  enemyAttack: {fileID: 492438996999220560}
+  bossAttack: {fileID: 0}
   takeDmg: {fileID: 5531654846073299213}
   transformRotationSpeed: 100
   followRange: 100
@@ -180,6 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e84929f6b56630942b30631367cdb09b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  usageType: 0
   attackType: 0
   player: {fileID: 0}
   useDeadEffect: 1

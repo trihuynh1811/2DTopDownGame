@@ -13,6 +13,12 @@ public class Bullet : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
     [SerializeField] int maxBounceTime;
     [SerializeField] float maxExistTime;
+
+    [Header("For Enemy")]
+    [SerializeField] bool spawnFireBallInCircle;
+    [SerializeField] GameObject smallFireBall;
+    [SerializeField] int numberOfSmallFireBall, smallFireBallDmg;
+    [SerializeField] float smallFireBallSpeed, spread, radius;
     public bool canBounce { get; set; }
     int damage;
     Vector3 lastVelocity;
@@ -50,6 +56,10 @@ public class Bullet : MonoBehaviour
                         break;
 
                     case "Ground/Wall":
+                        if (spawnFireBallInCircle)
+                        {
+                            SpawnProjectiles(numberOfSmallFireBall);
+                        }
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
                 }
@@ -97,6 +107,28 @@ public class Bullet : MonoBehaviour
     public void SetDmg(int dmg)
     {
         damage = dmg;
+    }
+
+    void SpawnProjectiles(int numberOfProjectiles)
+    {
+        float angleStep = 360f / numberOfProjectiles;
+        float angle = 0f;
+
+        for (int i = 0; i <= numberOfProjectiles - 1; i++)
+        {
+
+            float projectileDirXposition = transform.position.x + Mathf.Sin((angle * Mathf.PI) / 180) * radius;
+            float projectileDirYposition = transform.position.y + Mathf.Cos((angle * Mathf.PI) / 180) * radius;
+
+            Vector2 projectileVector = new Vector2(projectileDirXposition, projectileDirYposition);
+            Vector2 projectileMoveDirection = (projectileVector - (Vector2)transform.position).normalized * smallFireBallSpeed;
+
+            var proj = ObjectPoolManager.SpawnObject(smallFireBall, (Vector2)transform.position, Quaternion.identity, ObjectPoolManager.PoolType.GameObject);
+            proj.GetComponent<Rigidbody2D>().AddForce(projectileMoveDirection, ForceMode2D.Force);
+            proj.GetComponent<Bullet>().SetDmg(smallFireBallDmg);
+
+            angle += angleStep;
+        }
     }
 
     IEnumerator DestroyAfter()

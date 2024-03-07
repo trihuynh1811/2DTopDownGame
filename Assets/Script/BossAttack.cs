@@ -28,9 +28,11 @@ public class BossAttack : MonoBehaviour
     [SerializeField] float rotation, numberOfShootPoint, radiusMultiplier;
     [SerializeField] List<Transform> shootPointList;
 
+    [SerializeField] Animator animator;
+    [SerializeField] AnimationClip attackClip;
     [SerializeField] GameObject ring;
     [SerializeField] List<GameObject> drone, laserLines, lasers;
-    [SerializeField] float ringRotationSpeed, minRotateTime, maxRotateTime, laserLength, damageRate, randomLaserTime;
+    [SerializeField] float ringRotationSpeed, minRotateTime, maxRotateTime, laserLength, damageRate, randomLaserTime, shootFireBallRate;
     [SerializeField] int laserDmg;
     [SerializeField] LayerMask hitMask;
     float currentRotateTime, currentDamageRate, currentRandomLaserTime;
@@ -70,12 +72,8 @@ public class BossAttack : MonoBehaviour
         {
 
             case Boss.MechaGolem:
-                //RotateRing();
-                //if (currentDamageRate > 0) currentDamageRate -= Time.deltaTime;
-                if (currentRandomLaserTime > 0)
-                {
-                    ActivateLaserRandomly();
-                }
+                GolemAttack();
+                if (currentDamageRate > 0) currentDamageRate -= Time.deltaTime;
                 currentRandomLaserTime -= Time.deltaTime;
                 if (currentRandomLaserTime <= 0)
                 {
@@ -226,7 +224,7 @@ public class BossAttack : MonoBehaviour
 
                 int numberMissile = Random.Range(minNumberMissle, maxNumberMissle);
                 Debug.Log(numberMissile);
-                if(currentFireRate <= 0)
+                if (currentFireRate <= 0)
                 {
                     for (int i = 0; i < numberMissile; i++)
                     {
@@ -240,6 +238,29 @@ public class BossAttack : MonoBehaviour
             }
         }
 
+    }
+
+    void GolemAttack()
+    {
+        if (currentDamageRate <= 0)
+        {
+            animator.Play(attackClip.name);
+            currentDamageRate = shootFireBallRate;
+        }
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 50) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 75) / 100))
+        {
+            drone.ForEach(d => d.SetActive(true));
+            RotateRing();
+
+        }
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100))
+        {
+            drone.ForEach(d => d.SetActive(false));
+            if (currentRandomLaserTime > 0)
+            {
+                ActivateLaserRandomly();
+            }
+        }
     }
 
     public void Explode()

@@ -166,17 +166,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunType: 0
   flameParticle: []
+  flameDetectPlayer: {fileID: 0}
   laser: {fileID: 0}
   laserStart: {fileID: 0}
   laserEnd: {fileID: 0}
-  hitEnemyLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  hitObjectLayerMask:
+  laserHitMask:
     serializedVersion: 2
     m_Bits: 0
   rayCastLength: 0
-  damage: 1
+  damage: 3
   criticalHitChance: 25
   energyConsume: 2
   gunSprite: {fileID: 8772381968105336059}
@@ -185,7 +183,7 @@ MonoBehaviour:
   maxBulletSpeed: 1000
   minBulletSpeed: 750
   fireRate: 0.15
-  spreadAngle: 10
+  spreadAngle: 5
   numberOfBullet: 1
   isShotGun: 0
 --- !u!50 &8471912841418959580
@@ -272,6 +270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemType: 0
   itemName: Plasma Rifle
   price: 20
   dropChance: 0
