@@ -6,7 +6,7 @@ using TMPro;
 public class Item : MonoBehaviour
 {
     public GameObject itemCanvas, weaponStatCanvas;
-    public GameObject item { get; set; }
+    public GameObject item;
     public int itemIndex { get; set; }
     public string _name;
     public TextMeshProUGUI itemNameText;

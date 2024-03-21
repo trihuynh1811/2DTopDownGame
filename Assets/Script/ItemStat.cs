@@ -14,6 +14,7 @@ public class ItemStat : MonoBehaviour
     public string itemName;
     public int price;
     public float dropChance;
+    public bool dropOneTime;
     [TextArea]
     public string itemDescription;
 }

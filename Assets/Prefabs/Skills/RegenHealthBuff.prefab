@@ -275,4 +275,5 @@ MonoBehaviour:
   itemName: Health Regen
   price: 50
   dropChance: 0
+  dropOneTime: 1
   itemDescription: Health regenerate when below 50% of max health

@@ -19,7 +19,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] GameObject smallFireBall;
     [SerializeField] int numberOfSmallFireBall, smallFireBallDmg;
     [SerializeField] float smallFireBallSpeed, spread, radius;
-    public bool canBounce { get; set; }
+    public bool canBounce;
     int damage;
     Vector3 lastVelocity;
     int currentBounceTime;
@@ -30,6 +30,9 @@ public class Bullet : MonoBehaviour
         _returnToPoolTime = StartCoroutine(DestroyAfter());
         switch (bulletBelongTo)
         {
+            case BulletBelongTo.Enemy:
+                currentBounceTime = 0;
+                break;
             case BulletBelongTo.Player:
                 canBounce = TopDownPlayerMovement.instance.canBounce;
                 currentBounceTime = 0;
@@ -62,6 +65,27 @@ public class Bullet : MonoBehaviour
                         }
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
+                    case "Shield":
+                        if (spawnFireBallInCircle)
+                        {
+                            SpawnProjectiles(numberOfSmallFireBall);
+                        }
+                        ObjectPoolManager.ReturnObjectToPool(gameObject);
+                        break;
+                }
+                break;
+            case BulletBelongTo.Player:
+                switch (collision.gameObject.tag)
+                {
+                    case "BlackHole":
+                        gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                        this.enabled = false;
+                        break;
+                    case "Enemy":
+                        collision.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
+                        ObjectPoolManager.ReturnObjectToPool(gameObject);
+                        break;
+
                 }
                 break;
         }
@@ -72,6 +96,33 @@ public class Bullet : MonoBehaviour
     {
         switch (bulletBelongTo)
         {
+            case BulletBelongTo.Enemy:
+                switch (collision.gameObject.tag)
+                {
+                    case "Player":
+                        collision.gameObject.GetComponent<TopDownPlayerMovement>().TakeDamage(damage);
+                        ObjectPoolManager.ReturnObjectToPool(gameObject);
+                        break;
+                    case "Ground/Wall":
+                        if (canBounce)
+                        {
+                            currentBounceTime++;
+                            if (currentBounceTime > maxBounceTime)
+                            {
+                                ObjectPoolManager.ReturnObjectToPool(gameObject);
+                            }
+                            var speed = lastVelocity.magnitude;
+                            var direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
+                            transform.right = direction.normalized;
+                            rb.velocity = direction.normalized * speed;
+                        }
+                        else
+                        {
+                            ObjectPoolManager.ReturnObjectToPool(gameObject);
+                        }
+                        break;
+                }
+                break;
             case BulletBelongTo.Player:
                 switch (collision.gameObject.tag)
                 {

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8186755416248043963}
   - component: {fileID: 428881810475097005}
   - component: {fileID: 7164899514306362978}
+  - component: {fileID: 7307347947316510295}
   m_Layer: 10
   m_Name: Energy
   m_TagString: Coin
@@ -138,6 +139,7 @@ MonoBehaviour:
   rb: {fileID: 7164899514306362978}
   transformRotationSpeed: 10
   speed: 500
+  amountOfCoin: 0
 --- !u!50 &7164899514306362978
 Rigidbody2D:
   serializedVersion: 4
@@ -165,3 +167,21 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &7307347947316510295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7706973486912635684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5a97373d9261b459ce820ca4f50471, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 0
+  itemName: 
+  price: 0
+  dropChance: 0
+  dropOneTime: 0
+  itemDescription: 

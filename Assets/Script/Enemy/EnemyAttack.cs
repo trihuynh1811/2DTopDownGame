@@ -21,8 +21,9 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] GameObject player;
     [SerializeField] bool useDeadEffect;
     [SerializeField] GameObject deathEffect;
-    [SerializeField] Animator animator;
-    [SerializeField] AnimationClip deathClip;
+    [SerializeField] bool useAttackAnimation;
+    public Animator animator;
+    [SerializeField] AnimationClip deathClip, attackClip;
     [SerializeField] int explosionDmg;
     [SerializeField] float explosionForce, explosionTime, splashRadius;
 
@@ -41,9 +42,15 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] LineRenderer laser;
     [SerializeField] int laserLength;
     [SerializeField] float laserExistTime;
-    [SerializeField] LayerMask playerMask;
+    [SerializeField] LayerMask laserHitMask;
+    [SerializeField] GameObject laserEnd;
     RaycastHit2D hit;
-    float currentLaserExistTime;
+    float currentLaserExistTime, distance;
+
+    [SerializeField] GameObject bullet;
+    [SerializeField] int numberOfBullet;
+    [SerializeField] float bulletSpeed, spreadAngle, minBulletSpeed, maxBulletSpeed;
+    float spread, currentBulletSpeed;
 
     private void Awake()
     {
@@ -56,6 +63,7 @@ public class EnemyAttack : MonoBehaviour
                     case AttackType.ShootLaser:
                         laser.SetPosition(1, new Vector2(laserLength, 0));
                         laser.gameObject.SetActive(false);
+                        laserEnd.SetActive(false);
                         break;
                     case AttackType.ShootFlame:
                         for (int i = 0; i < flameParticleList.Count; i++)
@@ -83,6 +91,20 @@ public class EnemyAttack : MonoBehaviour
             case AttackType.ShootFlame:
                 RotateGun();
                 ShootFlame();
+                if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
+                break;
+            case AttackType.ShootProjectile:
+                if(currentFireRate <= 0)
+                {
+                    if (useAttackAnimation)
+                    {
+                        animator.Play(attackClip.name);
+                    }
+                    else
+                    {
+                        ShootBullet();
+                    }
+                }
                 if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
         }
@@ -148,6 +170,7 @@ public class EnemyAttack : MonoBehaviour
     }
     void ShootLaser()
     {
+        laserEnd.SetActive(false);
         if (currentLaserExistTime > 0)
         {
             currentLaserExistTime -= Time.deltaTime;
@@ -165,21 +188,31 @@ public class EnemyAttack : MonoBehaviour
         yield return new WaitForSeconds(1f);
         currentLaserExistTime = laserExistTime;
         laser.gameObject.SetActive(false);
+        laserEnd.SetActive(false);
         currentFireRate = 0;
     }
 
     void ActivateLaser()
     {
         laser.gameObject.SetActive(true);
-        hit = Physics2D.Raycast(firePoint.position, firePoint.right, laserLength, playerMask);
+        hit = Physics2D.Raycast(firePoint.position, firePoint.right, laserLength, laserHitMask);
         if (hit)
         {
-            if (currentFireRate <= 0)
+            if (hit.collider.gameObject.CompareTag("Player") && currentFireRate <= 0)
             {
                 TopDownPlayerMovement.instance.TakeDamage(damage);
                 currentFireRate = fireRate;
             }
+            distance = ((Vector2)hit.point - (Vector2)firePoint.transform.position).magnitude;
+            laserEnd.transform.position = hit.point;
+            laserEnd.SetActive(true);
         }
+        else
+        {
+            laserEnd.SetActive(false);
+            distance = laserLength;
+        }
+        laser.SetPosition(1, new Vector2(distance, 0));
     }
 
     public void DisableAttack()
@@ -214,6 +247,21 @@ public class EnemyAttack : MonoBehaviour
 
         // Rotate towards the target rotation
         gunTransform.rotation = Quaternion.RotateTowards(gunTransform.rotation, targetQuaternion, gunRotationSpeed * Time.deltaTime);
+    }
+
+    public void ShootBullet()
+    {
+        currentFireRate = fireRate;
+        for (int i = 0; i < numberOfBullet; i++)
+        {
+            spread = Random.Range(-spreadAngle, spreadAngle);
+            currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
+            Vector2 direction = Quaternion.Euler(0, 0, spread) * firePoint.right;
+            GameObject bulletClone = ObjectPoolManager.SpawnObject(bullet, firePoint.position, firePoint.rotation, ObjectPoolManager.PoolType.GameObject);
+            bulletClone.GetComponent<Bullet>().SetDmg(damage);
+            bulletClone.transform.right = direction.normalized;
+            bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
+        }
     }
 
     void ShootFlame()

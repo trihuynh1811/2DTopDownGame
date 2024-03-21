@@ -17,12 +17,15 @@ public class Buff : MonoBehaviour
         MoreBulletForShotgun,
         MoreCriticalDmgMultiplier,
         CanBounce,
-        AllowHealthRegen
+        AllowHealthRegen,
+        Dash,
+        Shield
     }
 
     Vector2 originalScale;
     public BuffType buffType;
     public int buffAmount;
+    public bool isSpecialBuff;
 
     private void Awake()
     {

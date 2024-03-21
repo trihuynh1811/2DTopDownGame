@@ -19,6 +19,23 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     [SerializeField] Animator animator;
     [SerializeField] Rigidbody2D rb;
     [SerializeField] float speed;
+    // player dash
+    [SerializeField] GameObject playerDashAfterImage;
+    [SerializeField] int numberOfAfterImage;
+    [SerializeField] float dashLength = .5f, dashCooldown = 1f, dashSpeed;
+    [SerializeField] GameObject dashBg;
+    [SerializeField] RectMask2D dashMask;
+    [SerializeField] float maxDaskMaskValue;
+    float dashCounter;
+    float dashCoolCounter, timer;
+    bool isDashing;
+    // player Shield
+    [SerializeField] GameObject shield;
+    [SerializeField] float shieldOnTime, shieldCoolDownTime;
+    [SerializeField] GameObject shieldBg;
+    [SerializeField] RectMask2D shieldMask;
+    [SerializeField] float maxShieldMaskValue;
+    float currentShieldOnTime, currentShieldCoolDownTime;
     // player take damage
     [SerializeField] GameObject floatingText;
     [SerializeField] Transform floatingTextPos;
@@ -45,6 +62,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     public GameObject buffStatPanel;
     public TextMeshProUGUI maxHealthText, maxArmourText, maxEnergyText, weaponDamageText, weaponRofText, criticalChanceText, criticalDamageText, weaponAccuracyText, movementSpeedText, numberOfBulletText;
     int currentMaxHealth, currenMaxtArmour, currentMaxEnergy, currentSpeed, currentCriticalDamage;
+    float currentMoveSpeed;
 
     public int dmg { get; set; }
     public int numberOfBullet { get; set; }
@@ -54,6 +72,8 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     public float rateOfFire { get; set; }
     public bool canBounce { get; set; }
     public bool allowHealthRegen { get; set; }
+    public bool canDash { get; set; }
+    public bool canUseShield { get; set; }
 
     Vector2 moveDirection, newFloatingTextPos;
     Material originalMat;
@@ -72,7 +92,18 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     private void Awake()
     {
         instance = this;
+        currentMoveSpeed = speed;
         originalMat = playerSprite.material;
+        //if (ObjectPoolManager.ObjectPools.Find(x => x.LookUpString.Equals(playerDashAfterImage.name)) == null)
+        //{
+        //    for (int i = 0; i < numberOfAfterImage; i++)
+        //    {
+        //        GameObject cloneObject = ObjectPoolManager.SpawnObject(playerDashAfterImage, transform.position, transform.rotation);
+        //        cloneObject.GetComponent<AfterImageSprite>().objectTransform = transform;
+        //        cloneObject.GetComponent<AfterImageSprite>().objectSr = playerSprite;
+        //        cloneObject.transform.SetParent(transform);
+        //    }
+        //}
     }
 
     private void Start()
@@ -125,6 +156,55 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
         {
             ConsumeEnergy();
         }
+        if (dashCounter > 0)
+        {
+            dashCounter -= Time.deltaTime;
+            //timer += Time.deltaTime;
+            float dashProgress = 1f - (dashCounter / dashLength);
+            dashMask.padding = new Vector4(0, 0, 0, Mathf.Lerp(0, maxDaskMaskValue, dashProgress));
+            if (dashCounter <= 0)
+            {
+                dashCounter = 0;
+                speed = currentMoveSpeed;
+                dashCoolCounter = dashCooldown;
+                isDashing = false;
+            }
+            //dashMask.padding = new Vector4(0, 0, 0, Mathf.Lerp(0, maxDaskMaskValue, timer / dashLength));
+        }
+        if (dashCoolCounter > 0)
+        {
+            dashCoolCounter -= Time.deltaTime;
+            //timer += Time.deltaTime;
+            float cooldownProgress = 1f - (dashCoolCounter / dashCooldown);
+            dashMask.padding = new Vector4(0, 0, 0, Mathf.Lerp(maxDaskMaskValue, 0, cooldownProgress));
+            if (dashCoolCounter <= 0)
+            {
+                dashCoolCounter = 0;
+            }
+            //dashMask.padding = new Vector4(0, 0, 0, Mathf.Lerp(maxDaskMaskValue, 0, timer / dashCooldown));
+        }
+        if (currentShieldOnTime > 0)
+        {
+            currentShieldOnTime -= Time.deltaTime;
+            float cooldownProgress = 1f - (currentShieldOnTime / shieldOnTime);
+            shieldMask.padding = new Vector4(0, 0, 0, Mathf.Lerp(0, maxShieldMaskValue, cooldownProgress));
+            if (currentShieldOnTime <= 0)
+            {
+                shield.SetActive(false);
+                currentShieldOnTime = 0;
+                currentShieldCoolDownTime = shieldCoolDownTime;
+            }
+        }
+        if (currentShieldCoolDownTime > 0)
+        {
+            currentShieldCoolDownTime -= Time.deltaTime;
+            float cooldownProgress = 1f - (currentShieldCoolDownTime / shieldCoolDownTime);
+            shieldMask.padding = new Vector4(0, 0, 0, Mathf.Lerp(maxShieldMaskValue, 0, cooldownProgress));
+            if (currentShieldCoolDownTime <= 0)
+            {
+                currentShieldCoolDownTime = 0;
+            }
+        }
         if (energyDeductionRate > 0) energyDeductionRate -= Time.deltaTime;
     }
     // Update is called once per frame
@@ -153,6 +233,11 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             pickUp.SwitchWeapon();
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1) && canUseShield)
+        {
+            ShieldOn();
+        }
+
         if (isPushed)
         {
             return;
@@ -164,8 +249,34 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     }
     void Move()
     {
-        rb.velocity = new Vector2((moveDirection.x * speed) + explosionForce.x, (moveDirection.y * speed) + explosionForce.y);
+        if (Input.GetKeyDown(KeyCode.Space) && canDash)
+        {
+            if (dashCoolCounter <= 0 && dashCounter <= 0)
+            {
+                speed = dashSpeed;
+                dashCounter = dashLength;
+                isDashing = true;
+            }
+        }
+        if (isDashing && moveDirection.x == 0)
+        {
+            rb.velocity = new Vector2((speed) + explosionForce.x, (moveDirection.y * speed) + explosionForce.y);
+        }
+        else
+        {
+            rb.velocity = new Vector2((moveDirection.x * speed) + explosionForce.x, (moveDirection.y * speed) + explosionForce.y);
+        }
         animator.SetFloat("Speed", rb.velocity.magnitude);
+    }
+
+    void ShieldOn()
+    {
+        if (currentShieldCoolDownTime <= 0)
+        {
+            currentShieldCoolDownTime = 0;
+            shield.SetActive(true);
+            currentShieldOnTime = shieldOnTime;
+        }
     }
 
     private void Flip()
@@ -353,18 +464,37 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
                                     case Buff.BuffType.AllowHealthRegen:
                                         allowHealthRegen = true;
                                         break;
+                                    case Buff.BuffType.Dash:
+                                        canDash = true;
+                                        dashBg.SetActive(true);
+                                        break;
+                                    case Buff.BuffType.Shield:
+                                        canUseShield = true;
+                                        shieldBg.SetActive(true);
+                                        break;
                                 }
                                 buff.gameObject.transform.parent = buffPos;
                                 buff.gameObject.transform.localPosition = Vector3.zero;
                                 StartCoroutine(buff.BuffPickUpEffect());
-                                if (pickUp.GetCurrentWeapon() != null)
+                                if (!buff.isSpecialBuff)
                                 {
-                                    pickUp.GetCurrentWeapon().gameObject.GetComponent<Gun>().ApplyBuff();
+                                    if (pickUp.GetCurrentWeapon() != null)
+                                    {
+                                        pickUp.GetCurrentWeapon().gameObject.GetComponent<Gun>().ApplyBuff();
+                                    }
+                                    Debug.Log("buy item");
+                                    Debug.Log(itemCollider.gameObject.GetComponent<Item>().price);
+                                    coin -= itemCollider.gameObject.GetComponent<Item>().price;
+                                    if (itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().dropOneTime)
+                                    {
+                                        Debug.Log(GameManager.instance.items.RemoveAll(x => x.GetComponent<ItemStat>().itemName.Equals(itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().itemName)));
+                                    }
+                                    UpdateUi();
                                 }
-                                Debug.Log("buy item");
-                                Debug.Log(itemCollider.gameObject.GetComponent<Item>().price);
-                                coin -= itemCollider.gameObject.GetComponent<Item>().price;
-                                UpdateUi();
+                                else
+                                {
+                                    itemCollider.gameObject.SetActive(false);
+                                }
                                 itemCollider.gameObject.GetComponent<Item>().bc2d.enabled = false;
                             }
                             break;
@@ -375,6 +505,10 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
                                 Debug.Log("buy item");
                                 Debug.Log(itemCollider.gameObject.GetComponent<Item>().price);
                                 coin -= itemCollider.gameObject.GetComponent<Item>().price;
+                                if (itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().dropOneTime)
+                                {
+                                    Debug.Log(GameManager.instance.items.RemoveAll(x => x.GetComponent<ItemStat>().itemName.Equals(itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().itemName)));
+                                }
                                 UpdateUi();
                                 itemCollider.gameObject.GetComponent<Item>().bc2d.enabled = false;
                             }
@@ -396,13 +530,17 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 
     public void TakeDamage(int dmg)
     {
+        if (isDashing)
+        {
+            return;
+        }
         int currentArmour = armour;
         if (dmg <= 0)
         {
             return;
         }
         armour -= dmg;
-        ShowDamage(dmg);
+        //ShowDamage(dmg);
         if (armour <= 0)
         {
             armour = 0;
@@ -554,6 +692,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     {
         currentSpeed += moreSpeed;
         speed += moreSpeed;
+        currentMoveSpeed = speed;
     }
 
     public void SetRoF()

@@ -22,10 +22,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] float spawnRate;
     [SerializeField] int numberOfMonsterPerSpawn, maxTime, maxWave, minSurvivalTime, maxSurvivalTime;
     [SerializeField] List<GameObject> monsterList;
+    List<GameObject> currentMonsterList;
+    public int listIndex, numberOfMonster;
     [SerializeField] GameObject spawnIndicator;
 
     [SerializeField] List<Transform> itemsPosList;
-    [SerializeField] List<GameObject> items, maps, walls, bosses;
+    public List<GameObject> items, maps, walls, bosses;
     [SerializeField] GameObject itemPosObject;
     public List<GameObject> currentItemList { get; set; }
 
@@ -59,6 +61,7 @@ public class GameManager : MonoBehaviour
         maxSpawnY = maxXYPos[0].y;
         minSpawnX = minXYPos[0].x;
         minSpawnY = minXYPos[0].y;
+        currentMonsterList = monsterList.GetRange(listIndex, numberOfMonster);
     }
 
     // Start is called before the first frame update
@@ -93,7 +96,20 @@ public class GameManager : MonoBehaviour
     void Spawn()
     {
         currentSpawnRate = spawnRate;
-
+        if (wave % 4 == 0 && wave < 15)
+        {
+            numberOfMonster = numberOfMonster < monsterList.Count - 1 ? numberOfMonster + 1 : monsterList.Count - 1;
+            currentMonsterList = monsterList.GetRange(listIndex, numberOfMonster);
+        }
+        if (wave == 13)
+        {
+            currentMonsterList.Add(monsterList[^1]);
+            monsterList.Remove(monsterList[^1]);
+        }
+        else if (wave > 13)
+        {
+            currentMonsterList = monsterList.ToList();
+        }
         randomNumberOfMonsterToSpawn = Random.Range(1, numberOfMonsterPerSpawn);
 
         for (int i = 0; i < randomNumberOfMonsterToSpawn; i++)
@@ -152,55 +168,61 @@ public class GameManager : MonoBehaviour
                 timerRunning = false;
                 triggerNewWaveObject.SetActive(true);
                 endOfWave = true;
-                if (lockedItemList.Count > 0)
-                {
-                    itemsPosList.ForEach(x => x.gameObject.SetActive(false));
-                    boxCollider2dList.ForEach(x => x.enabled = false);
-                    Debug.Log("locked item list count: " + lockedItemList.Count);
-                    for (int i = 0; i < lockedItemList.Count; i++)
-                    {
-                        Debug.Log("i: " + i);
-                        int itemPosIndex = itemsPosList.Count - (i + 1);
-                        Debug.Log(lockedItemList[i].name);
-                        Debug.Log(itemsPosList[itemPosIndex].name);
-                        GameObject item = Instantiate(lockedItemList[i], itemsPosList[itemPosIndex].transform.position, Quaternion.identity);
-                        itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price;
-                        itemsPosList[itemPosIndex].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
-                        itemsPosList[itemPosIndex].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
-                        itemsPosList[itemPosIndex].GetComponent<Item>().item = item.gameObject;
-                        item.transform.parent = spawnedItemPos;
-                        //spawnedItems.Add(item);
-                        item.SetActive(true);
-                        itemsPosList[itemPosIndex].gameObject.SetActive(true);
-                        //Debug.Log(itemPosIndex);
-                        boxCollider2dList[itemPosIndex].enabled = true;
-                    }
-                    itemPosObject.SetActive(true);
-                    spawnedItems = lockedItemList;
-                    lockedItemList.Clear();
+                //if (lockedItemList.Count > 0)
+                //{
+                //    itemsPosList.ForEach(x => x.gameObject.SetActive(false));
+                //    boxCollider2dList.ForEach(x => x.enabled = false);
+                //    Debug.Log("locked item list count: " + lockedItemList.Count);
+                //    for (int i = 0; i < lockedItemList.Count; i++)
+                //    {
+                //        Debug.Log("i: " + i);
+                //        int itemPosIndex = itemsPosList.Count - (i + 1);
+                //        Debug.Log(lockedItemList[i].name);
+                //        Debug.Log(itemsPosList[itemPosIndex].name);
+                //        GameObject item = Instantiate(lockedItemList[i], itemsPosList[itemPosIndex].transform.position, Quaternion.identity);
+                //        itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price;
+                //        itemsPosList[itemPosIndex].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
+                //        itemsPosList[itemPosIndex].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
+                //        itemsPosList[itemPosIndex].GetComponent<Item>().item = item.gameObject;
+                //        item.transform.parent = spawnedItemPos;
+                //        //spawnedItems.Add(item);
+                //        item.SetActive(true);
+                //        itemsPosList[itemPosIndex].gameObject.SetActive(true);
+                //        //Debug.Log(itemPosIndex);
+                //        boxCollider2dList[itemPosIndex].enabled = true;
+                //    }
+                //    itemPosObject.SetActive(true);
+                //    spawnedItems = lockedItemList;
+                //    lockedItemList.Clear();
 
-                }
-                else
+                //}
+                //else
+                //{
+                itemsPosList.ForEach(x => x.gameObject.SetActive(false));
+                boxCollider2dList.ForEach(collider => collider.enabled = false);
+                currentItemList = lockedItemList.Count > 0 ? lockedItemList : items.ToList();
+                int itemPosListCount = currentItemList.Count < itemsPosList.Count ? currentItemList.Count : itemsPosList.Count;
+                for (int i = 0; i < itemPosListCount; i++)
                 {
-                    currentItemList = items.ToList();
-                    for (int i = 0; i < itemsPosList.Count; i++)
-                    {
-                        int randomItemIndex = Random.Range(0, currentItemList.Count);
+                    int randomItemIndex = Random.Range(0, currentItemList.Count);
 
-                        GameObject item = Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
-                        itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price;
-                        itemsPosList[i].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
-                        itemsPosList[i].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
-                        itemsPosList[i].GetComponent<Item>().item = item.gameObject;
-                        currentItemList.RemoveAt(randomItemIndex);
-                        item.transform.parent = spawnedItemPos;
-                        //currentItemList.Remove(item);
-                        spawnedItems.Add(item);
-                    }
-                    itemsPosList.ForEach(x => x.gameObject.SetActive(true));
-                    boxCollider2dList.ForEach(collider => collider.enabled = true);
-                    itemPosObject.SetActive(true);
+                    GameObject item = Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
+                    itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price;
+                    itemsPosList[i].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
+                    itemsPosList[i].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
+                    itemsPosList[i].GetComponent<Item>().item = item.gameObject;
+                    currentItemList.RemoveAt(randomItemIndex);
+                    item.transform.parent = spawnedItemPos;
+                    item.SetActive(true);
+                    itemsPosList[i].gameObject.SetActive(true);
+                    boxCollider2dList[i].enabled = true;
+                    //currentItemList.Remove(item);
+                    spawnedItems.Add(item);
                 }
+                //itemsPosList.ForEach(x => x.gameObject.SetActive(true));
+                //boxCollider2dList.ForEach(collider => collider.enabled = true);
+                itemPosObject.SetActive(true);
+                //}
                 for (int i = 0; i < itemList.Count; i++)
                 {
                     itemList[i].GetComponent<HomingMissle>().enabled = true;
@@ -216,11 +238,11 @@ public class GameManager : MonoBehaviour
         waveCanvas.SetActive(true);
         yield return new WaitForSeconds(3f);
         waveCanvas.SetActive(false);
-        if(wave % 5 == 0)
+        if (wave % 5 == 0)
         {
             maps.ForEach(map => map.SetActive(false));
             walls.ForEach(wall => wall.SetActive(false));
-            int index = ((wave - 5) / 5) ;
+            int index = ((wave - 5) / 5);
             maps[index].SetActive(true);
             walls[index].SetActive(true);
             maxSpawnX = maxXYPos[index].x;
@@ -294,9 +316,9 @@ public class GameManager : MonoBehaviour
 
     GameObject randomMonster()
     {
-        int randomIndex = Random.Range(0, monsterList.Count);
+        int randomIndex = Random.Range(0, currentMonsterList.Count);
 
-        return monsterList[randomIndex];
+        return currentMonsterList[randomIndex];
     }
 
     public void SetNewWaveStart(bool startNewWave)

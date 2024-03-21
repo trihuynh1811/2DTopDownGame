@@ -10,8 +10,10 @@ public class EnemyAttackEditor : Editor
     SerializedProperty attackType;
     SerializedProperty useDeadEffect;
     SerializedProperty deathEffect;
+    SerializedProperty useAttackAnimation;
     SerializedProperty animator;
     SerializedProperty deathClip;
+    SerializedProperty attackClip;
     SerializedProperty explosionDmg;
     SerializedProperty explosionForce;
     SerializedProperty explosionTime;
@@ -32,7 +34,13 @@ public class EnemyAttackEditor : Editor
     SerializedProperty laser;
     SerializedProperty laserLength;
     SerializedProperty laserExistTime;
-    SerializedProperty playerMask;
+    SerializedProperty laserHitMask;
+    SerializedProperty laserEnd;
+
+    SerializedProperty bullet;
+    SerializedProperty numberOfBullet;
+    SerializedProperty bulletSpeed;
+    SerializedProperty spreadAngle, minBulletSpeed, maxBulletSpeed;
 
     private void OnEnable()
     {
@@ -40,8 +48,10 @@ public class EnemyAttackEditor : Editor
         attackType = serializedObject.FindProperty("attackType");
         useDeadEffect = serializedObject.FindProperty("useDeadEffect");
         deathEffect = serializedObject.FindProperty("deathEffect");
+        useAttackAnimation = serializedObject.FindProperty("useAttackAnimation");
         animator = serializedObject.FindProperty("animator");
         deathClip = serializedObject.FindProperty("deathClip");
+        attackClip = serializedObject.FindProperty("attackClip");
         explosionDmg = serializedObject.FindProperty("explosionDmg");
         explosionForce = serializedObject.FindProperty("explosionForce");
         explosionTime = serializedObject.FindProperty("explosionTime");
@@ -62,7 +72,15 @@ public class EnemyAttackEditor : Editor
         laser = serializedObject.FindProperty("laser");
         laserLength = serializedObject.FindProperty("laserLength");
         laserExistTime = serializedObject.FindProperty("laserExistTime");
-        playerMask = serializedObject.FindProperty("playerMask");
+        laserHitMask = serializedObject.FindProperty("laserHitMask");
+        laserEnd = serializedObject.FindProperty("laserEnd");
+
+        bullet = serializedObject.FindProperty("bullet");
+        numberOfBullet = serializedObject.FindProperty("numberOfBullet");
+        bulletSpeed = serializedObject.FindProperty("bulletSpeed");
+        spreadAngle = serializedObject.FindProperty("spreadAngle");
+        minBulletSpeed = serializedObject.FindProperty("minBulletSpeed");
+        maxBulletSpeed = serializedObject.FindProperty("maxBulletSpeed");
     }
 
     public override void OnInspectorGUI()
@@ -89,8 +107,13 @@ public class EnemyAttackEditor : Editor
                         break;
                     case EnemyAttack.AttackType.ShootFlame:
                         DisplayGeneralSetting();
-                        DisplayPlayerMask();
+                        //DisplayPlayerMask();
                         DisplayFlameThrowerSetting();
+                        DisplayDeathEffectSetting();
+                        break;
+                    case EnemyAttack.AttackType.ShootProjectile:
+                        DisplayGeneralSetting();
+                        DisplayShotgunBotSetting();
                         DisplayDeathEffectSetting();
                         break;
                 }
@@ -138,11 +161,12 @@ public class EnemyAttackEditor : Editor
         EditorGUILayout.PropertyField(laser);
         EditorGUILayout.PropertyField(laserLength);
         EditorGUILayout.PropertyField(laserExistTime);
+        EditorGUILayout.PropertyField(laserEnd);
     }
 
     void DisplayPlayerMask()
     {
-        EditorGUILayout.PropertyField(playerMask);
+        EditorGUILayout.PropertyField(laserHitMask);
     }
 
     void DisplayExplosionSetting()
@@ -160,5 +184,18 @@ public class EnemyAttackEditor : Editor
         EditorGUILayout.PropertyField(gunRotationSpeed);
         EditorGUILayout.PropertyField(flameDetectPlayerList);
         EditorGUILayout.PropertyField(gunTransform);
+    }
+
+    void DisplayShotgunBotSetting()
+    {
+        EditorGUILayout.PropertyField(bullet);
+        EditorGUILayout.PropertyField(bulletSpeed);
+        EditorGUILayout.PropertyField(spreadAngle);
+        EditorGUILayout.PropertyField(numberOfBullet);
+        EditorGUILayout.PropertyField(minBulletSpeed);
+        EditorGUILayout.PropertyField(maxBulletSpeed);
+        EditorGUILayout.PropertyField(useAttackAnimation);
+        EditorGUILayout.PropertyField(animator);
+        EditorGUILayout.PropertyField(attackClip);
     }
 }

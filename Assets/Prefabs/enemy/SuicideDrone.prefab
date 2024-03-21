@@ -157,6 +157,7 @@ MonoBehaviour:
   rotateZ: 0
   homingLikeRotate: 0
   explodeWhenDie: 1
+  instantRotate: 0
   speed: 45000
   avoidanceRadius: 0.3
   avoidanceForce: 55
@@ -220,15 +221,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1791aef43c33f44da65912d26390792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floatingText: {fileID: 4251474833571007199, guid: 7df1ce0b9c7e5f949b2ed3b6974e00dd, type: 3}
-  floatingTextPos: {fileID: 6791131991597964209}
+  floatingText: {fileID: 0}
+  floatingTextPos: {fileID: 0}
   randomFloatingTextPos: {x: 0.57, y: 0.77}
   health: 100
   multipleEnemySpriteList: 0
   enemySpriteList: []
   enemySprite: {fileID: 8068866104626920309}
   hurtMat: {fileID: 2100000, guid: d7ec828ad19179945ac97a24a25f74bc, type: 3}
-  flashDuration: 0.1
+  flashDuration: 0
 --- !u!1 &7334523845190294999
 GameObject:
   m_ObjectHideFlags: 0

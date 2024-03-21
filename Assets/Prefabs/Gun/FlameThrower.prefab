@@ -60,7 +60,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   rayCastLength: 32
-  damage: 5
+  damage: 15
   criticalHitChance: 0
   energyConsume: 1
   gunSprite: {fileID: 3925957229605034115}
@@ -158,8 +158,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   itemName: Flamethrower
-  price: 0
+  price: 95
   dropChance: 0
+  dropOneTime: 1
   itemDescription: 
 --- !u!1 &2248484912421652007
 GameObject:

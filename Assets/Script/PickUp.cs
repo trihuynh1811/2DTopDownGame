@@ -23,14 +23,8 @@ public class PickUp : MonoBehaviour
     {
         if (weaponList.Count >= maxWeaponCanHold)
         {
-            currentWeapon.GetComponent<Gun>().enabled = false;
-            currentWeapon.transform.parent = dropWeaponPos;
-            currentWeapon.transform.position = dropWeaponPos.position;
-            currentWeapon.transform.rotation = dropWeaponPos.rotation;
-            currentWeapon.transform.parent = null;
-            currentWeapon.layer = 9;
-            weaponList.Remove(currentWeapon);
-            currentWeapon = null;
+            ReplaceCurrentWeapon(weapon);
+            return;
         }
         weapon.GetComponent<Gun>().enabled = true;
         weapon.transform.parent = weaponPos;
@@ -74,6 +68,28 @@ public class PickUp : MonoBehaviour
             currentWeapon = null;
 
         }
+    }
+
+    void ReplaceCurrentWeapon(GameObject weapon)
+    {
+        currentWeapon.GetComponent<Gun>().enabled = false;
+        currentWeapon.transform.parent = dropWeaponPos;
+        currentWeapon.transform.position = dropWeaponPos.position;
+        currentWeapon.transform.rotation = dropWeaponPos.rotation;
+        currentWeapon.transform.parent = null;
+        currentWeapon.layer = 9;
+        int currentWeaponIndex = weaponList.FindIndex(x => x.name == currentWeapon.name);
+        //weaponList.Remove(currentWeapon);
+        //currentWeapon = null;
+        weaponList[currentWeaponIndex] = null;
+        weaponList[currentWeaponIndex] = weapon;
+        weapon.GetComponent<Gun>().enabled = true;
+        weapon.transform.parent = weaponPos;
+        weapon.transform.position = weaponPos.position;
+        weapon.transform.rotation = weaponPos.rotation;
+        weapon.layer = 0;
+        weapon.SetActive(true);
+        currentWeapon = weapon;
     }
 
     public void SwitchWeapon()

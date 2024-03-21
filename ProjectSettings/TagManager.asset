@@ -16,6 +16,9 @@ TagManager:
   - StartNewWave
   - Target
   - Crate
+  - BlackHole
+  - Shield
+  - EnemyBullet
   layers:
   - Default
   - TransparentFX
@@ -29,7 +32,7 @@ TagManager:
   - Weapon
   - Object
   - Buff
-  - 
+  - EnemyBullet
   - 
   - 
   - 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
+using System.Linq;
 
 public class EnemyChasePlayerTest : MonoBehaviour
 {
@@ -9,11 +10,11 @@ public class EnemyChasePlayerTest : MonoBehaviour
     [SerializeField] BossAttack bossAttack;
     [SerializeField] EnemyTakeDmg takeDmg;
 
-    [SerializeField] float transformRotationSpeed, followRange, attackRange;
+    public float transformRotationSpeed, followRange, attackRange;
     [SerializeField] Animator animator;
     [SerializeField] AnimationClip deadAnimation, idleAnimation, walkAnimation;
-    [SerializeField] Collider2D c2d;
-    [SerializeField] bool rotateX, rotateY, rotateZ, homingLikeRotate, explodeWhenDie;
+    public Collider2D c2d;
+    [SerializeField] bool rotateX, rotateY, rotateZ, homingLikeRotate, explodeWhenDie, instantRotate, pushWhenHitWall;
 
     public float speed = 5f;
     public float avoidanceRadius = 2f;
@@ -98,17 +99,32 @@ public class EnemyChasePlayerTest : MonoBehaviour
         }
         else
         {
-            // Determine the direction from the enemy to the player
-            Vector3 directionToPlayer = player.transform.position - transform.position;
+            if (instantRotate)
+            {
+                if (player.transform.position.x > transform.position.x)
+                {
+                    transform.localRotation = new Quaternion(0f, 0, 0f, 0f);
+                }
+                else if (player.transform.position.x < transform.position.x)
+                {
+                    transform.localRotation = new Quaternion(0f, 180f, 0f, 0f);
+                }
+            }
+            else
+            {
+                // Determine the direction from the enemy to the player
+                Vector3 directionToPlayer = player.transform.position - transform.position;
 
-            // Create the target rotation quaternion
-            Quaternion targetQuaternion = Quaternion.Euler(
-                rotateX ? (directionToPlayer.x > 0f) ? 0f : 180f : 0f,
-                rotateY ? (directionToPlayer.x > 0f) ? 0f : 180f : 0f,
-                rotateZ ? (directionToPlayer.x > 0f) ? 0f : 180f : 0f);
+                // Create the target rotation quaternion
+                Quaternion targetQuaternion = Quaternion.Euler(
+                    rotateX ? (directionToPlayer.x > 0f) ? 0f : 180f : 0f,
+                    rotateY ? (directionToPlayer.x > 0f) ? 0f : 180f : 0f,
+                    rotateZ ? (directionToPlayer.x > 0f) ? 0f : 180f : 0f);
 
-            // Rotate towards the target rotation
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetQuaternion, transformRotationSpeed * Time.deltaTime);
+                // Rotate towards the target rotation
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetQuaternion, transformRotationSpeed * Time.deltaTime);
+            }
+
         }
 
     }
@@ -166,7 +182,7 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
         foreach (Collider2D collider in colliders)
         {
-            if (collider != null && collider.gameObject != gameObject && collider.CompareTag("Enemy"))
+            if ((collider != null && collider.gameObject != gameObject && collider.CompareTag("Enemy")))
             {
                 // Calculate the avoidance direction and adjust the movement
                 Vector2 avoidDirection = (rb.position - (Vector2)collider.transform.position).normalized;
@@ -174,6 +190,14 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
                 // Apply the avoidance force using Rigidbody2D.AddForce
                 rb.AddForce(forceToAvoid);
+            }
+            if(pushWhenHitWall && collider.gameObject != gameObject && collider.CompareTag("Ground/Wall")){
+                // Calculate the avoidance direction and adjust the movement
+                Vector2 avoidDirection = (rb.position - (Vector2)collider.transform.position).normalized;
+                Vector2 forceToAvoid = avoidDirection * 10000;
+
+                // Apply the avoidance force using Rigidbody2D.AddForce
+                rb.AddForce(-forceToAvoid);
             }
         }
 
@@ -187,6 +211,15 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
     void Dead()
     {
+        if(itemList.Where(x => x.GetComponent<ItemStat>().dropOneTime).Any())
+        {
+            List<GameObject> oneItemList = itemList.Where(x => x.GetComponent<ItemStat>().dropOneTime).ToList();
+            for (int i = 0; i < oneItemList.Count; i++)
+            {
+                Vector2 randomPos = new(transform.position.x + Random.Range(-randomItemPos.x, randomItemPos.x), transform.position.y + Random.Range(-randomItemPos.y, randomItemPos.y));
+                GameObject item = Instantiate(oneItemList[i], randomPos, oneItemList[i].transform.rotation);
+            }
+        }
         if (animator != null)
         {
             if (deadAnimation != null)

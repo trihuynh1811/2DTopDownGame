@@ -272,6 +272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   itemName: Plasma Shotgun
-  price: 55
+  price: 85
   dropChance: 0
+  dropOneTime: 1
   itemDescription: 

@@ -51,6 +51,13 @@ public class BossAttackEditor : Editor
     SerializedProperty laserDmg;
     SerializedProperty hitMask;
 
+    SerializedProperty enemyChasePlayerTest;
+    SerializedProperty deathSprite;
+    SerializedProperty disappearClip, attack_2, attack_3;
+    SerializedProperty attackRate, blackHoleRotateSpeed, disappearRate, appearRate, shootRate, splashSpeed;
+    SerializedProperty blackHole, leftEyeTrail, rightEyeTrail, splash, shootPointListObject;
+    SerializedProperty deathMask;
+
     SerializedProperty useEffectWhenDie;
     SerializedProperty deathEffect;
     SerializedProperty explosionDmg;
@@ -114,6 +121,24 @@ public class BossAttackEditor : Editor
         laserDmg = serializedObject.FindProperty("laserDmg");
         hitMask = serializedObject.FindProperty("hitMask");
 
+        enemyChasePlayerTest = serializedObject.FindProperty("enemyChasePlayerTest");
+        deathSprite = serializedObject.FindProperty("deathSprite");
+        disappearClip = serializedObject.FindProperty("disappearClip");
+        attack_2 = serializedObject.FindProperty("attack_2");
+        attack_3 = serializedObject.FindProperty("attack_3");
+        deathMask = serializedObject.FindProperty("deathMask");
+        appearRate = serializedObject.FindProperty("appearRate");
+        shootRate = serializedObject.FindProperty("shootRate");
+        splashSpeed = serializedObject.FindProperty("splashSpeed");
+        attackRate = serializedObject.FindProperty("attackRate");
+        blackHoleRotateSpeed = serializedObject.FindProperty("blackHoleRotateSpeed");
+        disappearRate = serializedObject.FindProperty("disappearRate");
+        blackHole = serializedObject.FindProperty("blackHole");
+        leftEyeTrail = serializedObject.FindProperty("leftEyeTrail");
+        rightEyeTrail = serializedObject.FindProperty("rightEyeTrail");
+        splash = serializedObject.FindProperty("splash");
+        shootPointListObject = serializedObject.FindProperty("shootPointListObject");
+
         useEffectWhenDie = serializedObject.FindProperty("useEffectWhenDie");
         deathEffect = serializedObject.FindProperty("deathEffect");
         explosionDmg = serializedObject.FindProperty("explosionDmg");
@@ -145,6 +170,9 @@ public class BossAttackEditor : Editor
                 break;
             case BossAttack.Boss.Crab:
                 DisplaySettingForCrab();
+                break;
+            case BossAttack.Boss.Death:
+                DisplaySettingForDeath();
                 break;
         }
 
@@ -213,6 +241,30 @@ public class BossAttackEditor : Editor
         EditorGUILayout.PropertyField(missleIndicator);
         EditorGUILayout.PropertyField(missle);
         EditorGUILayout.PropertyField(missleSpawnPoint);
+    }
+
+    void DisplaySettingForDeath()
+    {
+        EditorGUILayout.PropertyField(animator);
+        EditorGUILayout.PropertyField(attackClip);
+        EditorGUILayout.PropertyField(enemyChasePlayerTest);
+        EditorGUILayout.PropertyField(deathSprite);
+        EditorGUILayout.PropertyField(disappearClip);
+        EditorGUILayout.PropertyField(attack_2);
+        EditorGUILayout.PropertyField(attack_3);
+        EditorGUILayout.PropertyField(deathMask);
+        EditorGUILayout.PropertyField(attackRate);
+        EditorGUILayout.PropertyField(blackHoleRotateSpeed);
+        EditorGUILayout.PropertyField(disappearRate);
+        EditorGUILayout.PropertyField(appearRate);
+        EditorGUILayout.PropertyField(shootRate);
+        EditorGUILayout.PropertyField(splashSpeed);
+        EditorGUILayout.PropertyField(blackHole);
+        EditorGUILayout.PropertyField(leftEyeTrail);
+        EditorGUILayout.PropertyField(rightEyeTrail);
+        EditorGUILayout.PropertyField(splash);
+        EditorGUILayout.PropertyField(shootPointList);
+        EditorGUILayout.PropertyField(shootPointListObject);
     }
 
     void DisplayDeathEffectSetting()

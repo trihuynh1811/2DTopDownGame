@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3778479256735862224}
   - component: {fileID: 5600047232883763319}
   - component: {fileID: 7703668155195891298}
+  - component: {fileID: -751980709646962568}
   m_Layer: 8
   m_Name: PlasmaBullet
   m_TagString: Untagged
@@ -172,9 +173,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2729e70f91417fd47972e70d822fcf7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletBelongTo: 0
   rb: {fileID: 3778479256735862224}
   maxBounceTime: 3
   maxExistTime: 10
+  spawnFireBallInCircle: 0
+  smallFireBall: {fileID: 0}
+  numberOfSmallFireBall: 0
+  smallFireBallDmg: 0
+  smallFireBallSpeed: 0
+  spread: 0
+  radius: 0
+--- !u!114 &-751980709646962568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3778479256735862229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f878c0c7950f3945b9c58b2f1c3b71b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pullable: 1
 --- !u!1 &5348950477181381758
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,8 @@ public class BossAttack : MonoBehaviour
     public enum Boss
     {
         Crab,
-        MechaGolem
+        MechaGolem,
+        Death
     }
     [SerializeField] Boss bossType;
 
@@ -38,6 +39,15 @@ public class BossAttack : MonoBehaviour
     float currentRotateTime, currentDamageRate, currentRandomLaserTime;
     Transform player;
 
+    [SerializeField] EnemyChasePlayerTest enemyChasePlayerTest;
+    [SerializeField] SpriteRenderer deathSprite;
+    [SerializeField] AnimationClip disappearClip, attack_2, attack_3;
+    [SerializeField] SpriteMask deathMask;
+    [SerializeField] float attackRate, blackHoleRotateSpeed, disappearRate, appearRate, shootRate, splashSpeed;
+    [SerializeField] GameObject blackHole, leftEyeTrail, rightEyeTrail, splash, shootPointListObject;
+    float currentAttackRate, currentDisappearRate, currentAppearRate, currentSpeed, currentShootRate, currentTransformRotateSpeed;
+    bool disappear;
+
     [SerializeField] bool useEffectWhenDie;
     [SerializeField] GameObject deathEffect;
     [SerializeField] int explosionDmg;
@@ -53,6 +63,9 @@ public class BossAttack : MonoBehaviour
     {
         currentRotateTime = Random.Range(minRotateTime, maxRotateTime);
         currentRandomLaserTime = randomLaserTime;
+        currentDisappearRate = disappearRate;
+        currentSpeed = enemyChasePlayerTest.speed;
+        currentTransformRotateSpeed = enemyChasePlayerTest.transformRotationSpeed;
         foreach (GameObject laser in lasers)
         {
             laser.SetActive(false);
@@ -87,6 +100,11 @@ public class BossAttack : MonoBehaviour
                     ShootPlayer();
                 }
                 if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
+                break;
+            case Boss.Death:
+                DeathAttack();
+                if (currentAttackRate > 0) currentAttackRate -= Time.deltaTime;
+
                 break;
 
         }
@@ -218,7 +236,7 @@ public class BossAttack : MonoBehaviour
                     flameDetectPlayer.damageRate = flameFireRate;
                 }
             }
-            if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100))
+            if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100))
             {
                 missleLauncher.SetActive(true);
 
@@ -228,9 +246,10 @@ public class BossAttack : MonoBehaviour
                 {
                     for (int i = 0; i < numberMissile; i++)
                     {
-                        Vector2 missleIndicatorPos = (Vector2)player.position + new Vector2(Random.Range(-35, 35), Random.Range(-15, 15));
-                        missleIndicatorPos.x = missleIndicatorPos.x > maxXpos ? maxXpos : missleIndicatorPos.x < minXpos ? minXpos : missleIndicatorPos.x;
-                        missleIndicatorPos.y = missleIndicatorPos.y > maxYpos ? maxYpos : missleIndicatorPos.y < minYpos ? minYpos : missleIndicatorPos.y;
+                        Vector2 missleIndicatorPos = new Vector2(Random.Range(minXpos, maxXpos), Random.Range(minYpos, maxYpos));
+                        //Vector2 missleIndicatorPos = (Vector2)player.position + new Vector2(Random.Range(minXpos, maxXpos), Random.Range(minYpos, maxYpos));
+                        //missleIndicatorPos.x = missleIndicatorPos.x > maxXpos ? maxXpos : missleIndicatorPos.x < minXpos ? minXpos : missleIndicatorPos.x;
+                        //missleIndicatorPos.y = missleIndicatorPos.y > maxYpos ? maxYpos : missleIndicatorPos.y < minYpos ? minYpos : missleIndicatorPos.y;
                         StartCoroutine(LaunchMissle(missleIndicatorPos, i));
                     }
                     currentFireRate = timeBtwLaunchingMissile;
@@ -253,7 +272,7 @@ public class BossAttack : MonoBehaviour
             RotateRing();
 
         }
-        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100))
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100))
         {
             drone.ForEach(d => d.SetActive(false));
             if (currentRandomLaserTime > 0)
@@ -261,6 +280,131 @@ public class BossAttack : MonoBehaviour
                 ActivateLaserRandomly();
             }
         }
+    }
+
+    void DeathAttack()
+    {
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 75) / 100))
+        {
+            if (currentAttackRate <= 0)
+            {
+                animator.Play(attackClip.name);
+                currentAttackRate = attackRate;
+            }
+        }
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 50) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 75) / 100))
+        {
+            currentAttackRate = 0;
+            DeathDisappear();
+            //blackHole.SetActive(true);
+            //blackHole.transform.Rotate(0, 0, blackHoleRotateSpeed * Time.deltaTime);
+
+        }
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100))
+        {
+            Time.timeScale = 1.0f;
+            enemyChasePlayerTest.rb.drag = 3;
+            enemyChasePlayerTest.speed = currentSpeed;
+            enemyChasePlayerTest.transformRotationSpeed = currentTransformRotateSpeed;
+            enemyChasePlayerTest.c2d.enabled = true;
+            leftEyeTrail.SetActive(true);
+            rightEyeTrail.SetActive(true);
+            enemyChasePlayerTest.speed = 1000000;
+            enemyChasePlayerTest.avoidanceForce = 10000;
+            if (currentAttackRate <= 0)
+            {
+                animator.Play(attack_2.name);
+                currentAttackRate = attackRate;
+            }
+            StartCoroutine(Blink());
+        }
+    }
+
+    void DeathDisappear()
+    {
+        if (currentDisappearRate > 0)
+        {
+            animator.Play(disappearClip.name);
+            enemyChasePlayerTest.c2d.enabled = false;
+            currentDisappearRate -= Time.deltaTime;
+            enemyChasePlayerTest.speed = 0;
+            disappear = true;
+        }
+        else
+        {
+            enemyChasePlayerTest.c2d.enabled = true;
+            enemyChasePlayerTest.speed = currentSpeed;
+            StartCoroutine(DeathAppear());
+        }
+    }
+
+    IEnumerator DeathAppear()
+    {
+        if (disappear)
+        {
+            animator.Rebind();
+            transform.position = (Vector2)player.transform.position + new Vector2(Random.Range(-7, 7), 0);
+            Time.timeScale = .5f;
+            animator.Play(attack_2.name);
+        }
+        disappear = false;
+        yield return new WaitForSeconds(attack_2.length);
+        shootPointListObject.SetActive(true);
+        enemyChasePlayerTest.speed = 0;
+        enemyChasePlayerTest.transformRotationSpeed = 0;
+        animator.Play(attack_3.name);
+        yield return new WaitForSeconds(attack_3.length);
+        currentDisappearRate = disappearRate;
+        currentAttackRate = 0;
+        enemyChasePlayerTest.speed = currentSpeed;
+        enemyChasePlayerTest.transformRotationSpeed = currentTransformRotateSpeed;
+        shootPointListObject.SetActive(false);
+        yield return new WaitForSeconds(appearRate);
+    }
+
+    IEnumerator Blink()
+    {
+        while (true)
+        {
+            deathMask.sprite = deathSprite.sprite;
+            deathSprite.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+            yield return new WaitForSeconds(10f);
+            deathMask.sprite = deathSprite.sprite;
+            deathSprite.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            yield return new WaitForSeconds(10f);
+        }
+    }
+
+    public void ShootSplash()
+    {
+        if (currentShootRate <= 0)
+        {
+            shootPointListObject.SetActive(true);
+            StartCoroutine(SpawnSplash());
+        }
+        else
+        {
+            shootPointListObject.SetActive(false);
+            currentShootRate -= Time.deltaTime;
+        }
+
+    }
+
+    IEnumerator SpawnSplash()
+    {
+        enemyChasePlayerTest.speed = 0;
+        enemyChasePlayerTest.transformRotationSpeed = 0;
+        yield return new WaitForSeconds(1f);
+        for (int i = 0; i < shootPointList.Count; i++)
+        {
+            Debug.Log(i);
+            GameObject splashClone = ObjectPoolManager.SpawnObject(splash, shootPointList[i].position, shootPointList[i].rotation, ObjectPoolManager.PoolType.GameObject);
+            splashClone.GetComponent<Bullet>().SetDmg(15);
+            splashClone.GetComponent<Rigidbody2D>().AddForce(shootPointList[i].right.normalized * splashSpeed, ForceMode2D.Impulse);
+        }
+        currentShootRate = shootRate;
+        enemyChasePlayerTest.speed = currentSpeed;
+        enemyChasePlayerTest.transformRotationSpeed = currentTransformRotateSpeed;
     }
 
     public void Explode()

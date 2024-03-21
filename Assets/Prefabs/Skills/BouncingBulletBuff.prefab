@@ -275,4 +275,5 @@ MonoBehaviour:
   itemName: Bouncing Bullet
   price: 5
   dropChance: 0
+  dropOneTime: 1
   itemDescription: Bullet can bounce

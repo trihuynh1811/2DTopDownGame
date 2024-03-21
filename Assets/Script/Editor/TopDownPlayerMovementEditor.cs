@@ -20,6 +20,17 @@ public class YourScriptEditor : Editor
     SerializedProperty animator;
     SerializedProperty rb;
     SerializedProperty speed;
+    SerializedProperty playerDashAfterImage;
+    SerializedProperty numberOfAfterImage;
+    SerializedProperty dashLength;
+    SerializedProperty dashCooldown;
+    SerializedProperty dashSpeed;
+    SerializedProperty dashBg;
+    SerializedProperty dashMask;
+    SerializedProperty maxDaskMaskValue;
+    SerializedProperty shieldBg;
+    SerializedProperty shieldMask;
+    SerializedProperty maxShieldMaskValue;
     SerializedProperty floatingText;
     SerializedProperty floatingTextPos;
     SerializedProperty randomFloatingTextPos;
@@ -27,6 +38,9 @@ public class YourScriptEditor : Editor
     SerializedProperty playerSprite;
     SerializedProperty hurtMat;
     SerializedProperty magnitude;
+    SerializedProperty shield;
+    SerializedProperty shieldOnTime;
+    SerializedProperty shieldCoolDownTime;
 
     SerializedProperty healthSlider;
     SerializedProperty armourSlider;
@@ -83,6 +97,17 @@ public class YourScriptEditor : Editor
         animator = serializedObject.FindProperty("animator");
         rb = serializedObject.FindProperty("rb");
         speed = serializedObject.FindProperty("speed");
+        dashBg = serializedObject.FindProperty("dashBg");
+        dashMask = serializedObject.FindProperty("dashMask");
+        maxDaskMaskValue = serializedObject.FindProperty("maxDaskMaskValue");
+        shieldBg = serializedObject.FindProperty("shieldBg");
+        shieldMask = serializedObject.FindProperty("shieldMask");
+        maxShieldMaskValue = serializedObject.FindProperty("maxShieldMaskValue");
+        playerDashAfterImage = serializedObject.FindProperty("playerDashAfterImage");
+        numberOfAfterImage = serializedObject.FindProperty("numberOfAfterImage");
+        dashLength = serializedObject.FindProperty("dashLength");
+        dashCooldown = serializedObject.FindProperty("dashCooldown");
+        dashSpeed = serializedObject.FindProperty("dashSpeed");
         floatingText = serializedObject.FindProperty("floatingText");
         floatingTextPos = serializedObject.FindProperty("floatingTextPos");
         randomFloatingTextPos = serializedObject.FindProperty("randomFloatingTextPos");
@@ -90,6 +115,9 @@ public class YourScriptEditor : Editor
         playerSprite = serializedObject.FindProperty("playerSprite");
         hurtMat = serializedObject.FindProperty("hurtMat");
         magnitude = serializedObject.FindProperty("magnitude");
+        shield = serializedObject.FindProperty("shield");
+        shieldOnTime = serializedObject.FindProperty("shieldOnTime");
+        shieldCoolDownTime = serializedObject.FindProperty("shieldCoolDownTime");
 
         healthSlider = serializedObject.FindProperty("healthSlider");
         armourSlider = serializedObject.FindProperty("armourSlider");
@@ -175,6 +203,17 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(animator);
         EditorGUILayout.PropertyField(rb);
         EditorGUILayout.PropertyField(speed);
+        EditorGUILayout.PropertyField(playerDashAfterImage);
+        EditorGUILayout.PropertyField(numberOfAfterImage);
+        EditorGUILayout.PropertyField(dashLength);
+        EditorGUILayout.PropertyField(dashCooldown);
+        EditorGUILayout.PropertyField(dashSpeed);
+        EditorGUILayout.PropertyField(dashBg);
+        EditorGUILayout.PropertyField(dashMask);
+        EditorGUILayout.PropertyField(maxDaskMaskValue);
+        EditorGUILayout.PropertyField(shieldBg);
+        EditorGUILayout.PropertyField(shieldMask);
+        EditorGUILayout.PropertyField(maxShieldMaskValue);
         EditorGUILayout.PropertyField(floatingText);
         EditorGUILayout.PropertyField(floatingTextPos);
         EditorGUILayout.PropertyField(randomFloatingTextPos);
@@ -182,6 +221,9 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(playerSprite);
         EditorGUILayout.PropertyField(hurtMat);
         EditorGUILayout.PropertyField(magnitude);
+        EditorGUILayout.PropertyField(shield);
+        EditorGUILayout.PropertyField(shieldOnTime);
+        EditorGUILayout.PropertyField(shieldCoolDownTime);
     }
 
     void ShowUiSetting()

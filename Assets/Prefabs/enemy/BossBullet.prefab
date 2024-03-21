@@ -165,3 +165,10 @@ MonoBehaviour:
   rb: {fileID: 5397363355051420271}
   maxBounceTime: 0
   maxExistTime: 10
+  spawnFireBallInCircle: 0
+  smallFireBall: {fileID: 0}
+  numberOfSmallFireBall: 0
+  smallFireBallDmg: 0
+  smallFireBallSpeed: 0
+  spread: 0
+  radius: 0

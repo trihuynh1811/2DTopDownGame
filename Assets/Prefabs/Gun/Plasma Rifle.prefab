@@ -274,4 +274,5 @@ MonoBehaviour:
   itemName: Plasma Rifle
   price: 20
   dropChance: 0
+  dropOneTime: 1
   itemDescription: 

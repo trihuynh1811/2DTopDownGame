@@ -579,6 +579,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   itemName: Multi-Color Laser
-  price: 75
+  price: 120
   dropChance: 0
+  dropOneTime: 1
   itemDescription: 
