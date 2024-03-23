@@ -25,7 +25,7 @@ public class HomingMissle : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -43,33 +43,35 @@ public class HomingMissle : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        switch (collision.gameObject.tag)
         {
-            switch (missleType)
-            {
-                case MissleType.Coin:
-                    gameObject.transform.parent = TopDownPlayerMovement.instance.itemPos;
-                    gameObject.transform.position = Vector3.zero;
-                    TopDownPlayerMovement.instance.coin += Random.Range(1, amountOfCoin);
-                    TopDownPlayerMovement.instance.UpdateUi();
-                    if(GameManager.itemList.Count > 0 && GameManager.itemList.Find(x => x == gameObject))
-                    {
-                        GameManager.itemList.Remove(gameObject);
-                    }
-                    gameObject.SetActive(false);
-                    break;
-                case MissleType.Energy:
-                    gameObject.transform.parent = TopDownPlayerMovement.instance.itemPos;
-                    gameObject.transform.position = Vector3.zero;
-                    TopDownPlayerMovement.instance.AddMoreEnergy(Random.Range(1, 5));
-                    TopDownPlayerMovement.instance.UpdateUi();
-                    if (GameManager.itemList.Count > 0 && GameManager.itemList.Find(x => x == gameObject))
-                    {
-                        GameManager.itemList.Remove(gameObject);
-                    }
-                    gameObject.SetActive(false);
-                    break;
-            }
+            case "Player":
+                switch (missleType)
+                {
+                    case MissleType.Coin:
+                        gameObject.transform.parent = TopDownPlayerMovement.instance.itemPos;
+                        gameObject.transform.position = Vector3.zero;
+                        TopDownPlayerMovement.instance.coin += Random.Range(1, amountOfCoin);
+                        TopDownPlayerMovement.instance.UpdateUi();
+                        if (GameManager.itemList.Count > 0 && GameManager.itemList.Find(x => x == gameObject))
+                        {
+                            GameManager.itemList.Remove(gameObject);
+                        }
+                        gameObject.SetActive(false);
+                        break;
+                    case MissleType.Energy:
+                        gameObject.transform.parent = TopDownPlayerMovement.instance.itemPos;
+                        gameObject.transform.position = Vector3.zero;
+                        TopDownPlayerMovement.instance.AddMoreEnergy(Random.Range(1, 5));
+                        TopDownPlayerMovement.instance.UpdateUi();
+                        if (GameManager.itemList.Count > 0 && GameManager.itemList.Find(x => x == gameObject))
+                        {
+                            GameManager.itemList.Remove(gameObject);
+                        }
+                        gameObject.SetActive(false);
+                        break;
+                }
+                break;
         }
     }
 }

@@ -27,6 +27,8 @@ public class GunEditor : Editor
     SerializedProperty fireRate;
     SerializedProperty spreadAngle;
     SerializedProperty numberOfBullet;
+    SerializedProperty audioSource;
+    SerializedProperty gunSound;
     SerializedProperty isShotGun;
 
     void OnEnable()
@@ -54,6 +56,8 @@ public class GunEditor : Editor
         fireRate = serializedObject.FindProperty("fireRate");
         spreadAngle = serializedObject.FindProperty("spreadAngle");
         numberOfBullet = serializedObject.FindProperty("numberOfBullet");
+        audioSource = serializedObject.FindProperty("audioSource");
+        gunSound = serializedObject.FindProperty("gunSound");
         isShotGun = serializedObject.FindProperty("isShotGun");
     }
 
@@ -92,6 +96,8 @@ public class GunEditor : Editor
         EditorGUILayout.PropertyField(gunSprite);
         EditorGUILayout.PropertyField(firePoint);
         EditorGUILayout.PropertyField(fireRate);
+        EditorGUILayout.PropertyField(audioSource);
+        EditorGUILayout.PropertyField(gunSound);
     }
 
     public void displaySettingForNormalGun()

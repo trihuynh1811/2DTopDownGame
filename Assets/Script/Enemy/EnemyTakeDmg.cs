@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyTakeDmg : MonoBehaviour, ITakeDamage
 {
@@ -15,9 +16,20 @@ public class EnemyTakeDmg : MonoBehaviour, ITakeDamage
     Material originalMat;
     List<Material> originMatList = new List<Material>();
     [SerializeField] float flashDuration;
+    public Transform healthCanvasPos;
+    public GameObject healtCanvas;
+    public Image healthBar;
     float currentFlashDuration;
     public int maxHealth { get; set; }
     Vector2 newFloatingTextPos;
+
+    private void Awake()
+    {
+        if(healthBar != null && healtCanvas != null)
+        {
+            healthBar.fillAmount = health;
+        }
+    }
 
     private void Start()
     {
@@ -43,7 +55,17 @@ public class EnemyTakeDmg : MonoBehaviour, ITakeDamage
             ShowDamage(dmg);
         }
         health -= dmg;
+        if (healthBar != null && healtCanvas != null)
+        {
+            Debug.Log((float)health / maxHealth);
+            healthBar.fillAmount = (float)health / maxHealth;
+        }
         StartCoroutine(GetHit());
+    }
+
+    public void HealthCanvasFollow()
+    {
+        healtCanvas.transform.position = healthCanvasPos.position;
     }
 
     IEnumerator GetHit()

@@ -85,6 +85,7 @@ public class EnemyAttack : MonoBehaviour
                 Explode();
                 break;
             case AttackType.ShootLaser:
+                laserEnd.SetActive(false);
                 ShootLaser();
                 if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
@@ -195,6 +196,7 @@ public class EnemyAttack : MonoBehaviour
     void ActivateLaser()
     {
         laser.gameObject.SetActive(true);
+        laserEnd.SetActive(false);
         hit = Physics2D.Raycast(firePoint.position, firePoint.right, laserLength, laserHitMask);
         if (hit)
         {

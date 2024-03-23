@@ -36,6 +36,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     [SerializeField] RectMask2D shieldMask;
     [SerializeField] float maxShieldMaskValue;
     float currentShieldOnTime, currentShieldCoolDownTime;
+    bool isShielded;
     // player take damage
     [SerializeField] GameObject floatingText;
     [SerializeField] Transform floatingTextPos;
@@ -56,6 +57,9 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
     [SerializeField] GameObject startNewWaveTxt;
     [SerializeField] Text weaponDmg, weaponRoF, weaponEnergyConsume, weaponCriticalHit, weaponAccuracy;
     [SerializeField] TextMeshProUGUI buffDesc;
+    public GameObject winLoseCanvas, winCanvas, loseCanvas, dieCanvas;
+    public int reviveCoin = 500, deadTime = 0, monsterKill, damageDeal;
+    public Text reviveCoinText, monsterKillText, damageDealText;
 
     public Text healthText, armourText, energyText, coinText;
 
@@ -191,6 +195,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             if (currentShieldOnTime <= 0)
             {
                 shield.SetActive(false);
+                isShielded = false;
                 currentShieldOnTime = 0;
                 currentShieldCoolDownTime = shieldCoolDownTime;
             }
@@ -275,6 +280,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
         {
             currentShieldCoolDownTime = 0;
             shield.SetActive(true);
+            isShielded = true;
             currentShieldOnTime = shieldOnTime;
         }
     }
@@ -350,6 +356,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
         GameManager.instance.DisableLockItemCanvas();
         buffDescCanvas.SetActive(false);
         startNewWaveTxt.SetActive(false);
+        weaponStatCanvas.SetActive(false);
 
         weaponCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, weaponMask);
         itemCollider = Physics2D.OverlapCircle(transform.position, pickUpRadius, itemMask);
@@ -364,6 +371,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             weaponStatCanvas.SetActive(true);
             if (Input.GetKeyDown(KeyCode.X))
             {
+                Debug.Log("pick up weapon");
                 pickUp.PickUpWeapon(weaponCollider.gameObject);
             }
         }
@@ -499,12 +507,20 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
                             }
                             break;
                         case ItemStat.ItemType.Weapon:
+                            Debug.Log("detect weapon");
+                            weaponDmg.text = itemCollider.gameObject.GetComponent<Item>().item.gameObject.GetComponent<Gun>().Damage;
+                            weaponRoF.text = itemCollider.gameObject.GetComponent<Item>().item.gameObject.GetComponent<Gun>().FireRate;
+                            weaponEnergyConsume.text = itemCollider.gameObject.GetComponent<Item>().item.gameObject.GetComponent<Gun>().EnergyConsume;
+                            weaponCriticalHit.text = itemCollider.gameObject.GetComponent<Item>().item.gameObject.GetComponent<Gun>().CriticalHitChance;
+                            weaponAccuracy.text = itemCollider.gameObject.GetComponent<Item>().item.gameObject.GetComponent<Gun>().SpreadAngle;
+                            weaponStatCanvas.SetActive(true);
                             if (Input.GetKeyDown(KeyCode.X) && coin >= itemCollider.gameObject.GetComponent<Item>().price)
                             {
                                 GameManager.instance.spawnedItems.Remove(itemCollider.GetComponent<Item>().item);
-                                Debug.Log("buy item");
+                                Debug.Log("buy weapon");
                                 Debug.Log(itemCollider.gameObject.GetComponent<Item>().price);
                                 coin -= itemCollider.gameObject.GetComponent<Item>().price;
+                                pickUp.PickUpWeapon(itemCollider.gameObject.GetComponent<Item>().item);
                                 if (itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().dropOneTime)
                                 {
                                     Debug.Log(GameManager.instance.items.RemoveAll(x => x.GetComponent<ItemStat>().itemName.Equals(itemCollider.gameObject.GetComponent<Item>().item.GetComponent<ItemStat>().itemName)));
@@ -530,7 +546,7 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 
     public void TakeDamage(int dmg)
     {
-        if (isDashing)
+        if (isDashing || isShielded)
         {
             return;
         }
@@ -548,6 +564,10 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             if (health <= 0)
             {
                 health = 0;
+                Time.timeScale = 0.0f;
+                reviveCoinText.text = (reviveCoin * deadTime).ToString();
+                loseCanvas.SetActive(true);
+                winLoseCanvas.SetActive(true);
             }
         }
         StartCoroutine(GetHit());
@@ -615,17 +635,17 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
             switch (pickUp.GetCurrentWeapon().GetComponent<Gun>().gunType)
             {
                 case Gun.GunType.NormalGun:
-                    energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
+                    //energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
                     energyDeductionRate = 0;
                     UpdateUi();
                     break;
                 case Gun.GunType.LaserGun:
-                    energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
+                    //energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
                     energyDeductionRate = pickUp.GetCurrentWeapon().GetComponent<Gun>().GetFireRate();
                     UpdateUi();
                     break;
                 case Gun.GunType.Flamethrower:
-                    energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
+                    //energy -= pickUp.GetCurrentWeapon().GetComponent<Gun>().energyConsume;
                     energyDeductionRate = pickUp.GetCurrentWeapon().GetComponent<Gun>().GetFireRate();
                     UpdateUi();
                     break;
@@ -750,5 +770,41 @@ public class TopDownPlayerMovement : MonoBehaviour, ITakeDamage
 
     }
 
+    public void Revive()
+    {
+        if(coin >= reviveCoin * deadTime)
+        {
+            coin -= reviveCoin * deadTime;
+            health = maxHealth;
+            armour = maxArmour;
+            energy = maxEnergy;
+            UpdateUi();
+            deadTime++;
+            Time.timeScale = 1.0f;
+            loseCanvas.SetActive(false);
+            winLoseCanvas.SetActive(false);
+            boxCollider.enabled = false;
+            StartCoroutine(CountDownRevive());
+        }
+    }
 
+    public void CancelRevive()
+    {
+        loseCanvas.SetActive(false);
+        dieCanvas.SetActive(true);
+    }
+
+    public void Win()
+    {
+        Time.timeScale = 0.0f;
+        monsterKillText.text = monsterKill.ToString();
+        damageDealText.text = damageDeal.ToString();
+        winCanvas.SetActive(true);
+        winLoseCanvas.SetActive(true);
+    }
+    IEnumerator CountDownRevive()
+    {
+        yield return new WaitForSeconds(5f);
+        boxCollider.enabled = true;
+    }
 }

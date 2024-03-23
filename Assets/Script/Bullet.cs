@@ -13,6 +13,9 @@ public class Bullet : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
     [SerializeField] int maxBounceTime;
     [SerializeField] float maxExistTime;
+    [SerializeField] bool useImpactEffect, haveImpactRadius;
+    [SerializeField] GameObject impactEffect;
+    [SerializeField] float impactRadius;
 
     [Header("For Enemy")]
     [SerializeField] bool spawnFireBallInCircle;
@@ -54,11 +57,19 @@ public class Bullet : MonoBehaviour
                 switch (collision.gameObject.tag)
                 {
                     case "Player":
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
                         collision.gameObject.GetComponent<TopDownPlayerMovement>().TakeDamage(damage);
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
 
                     case "Ground/Wall":
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
                         if (spawnFireBallInCircle)
                         {
                             SpawnProjectiles(numberOfSmallFireBall);
@@ -66,6 +77,10 @@ public class Bullet : MonoBehaviour
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
                     case "Shield":
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
                         if (spawnFireBallInCircle)
                         {
                             SpawnProjectiles(numberOfSmallFireBall);
@@ -82,7 +97,26 @@ public class Bullet : MonoBehaviour
                         this.enabled = false;
                         break;
                     case "Enemy":
-                        collision.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
+                        if (haveImpactRadius)
+                        {
+                            Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, impactRadius);
+                            Debug.Log(colliders.Length);
+                            foreach (Collider2D collider in colliders)
+                            {
+                                if ((collider != null && collider.gameObject != gameObject && collider.CompareTag("Enemy")))
+                                {
+                                    collider.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ObjectPoolManager.ReturnObjectToPool(gameObject);
+                        }
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
 
@@ -100,10 +134,18 @@ public class Bullet : MonoBehaviour
                 switch (collision.gameObject.tag)
                 {
                     case "Player":
-                        collision.gameObject.GetComponent<TopDownPlayerMovement>().TakeDamage(damage);
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
+                            collision.gameObject.GetComponent<TopDownPlayerMovement>().TakeDamage(damage);
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
                     case "Ground/Wall":
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
                         if (canBounce)
                         {
                             currentBounceTime++;
@@ -121,17 +163,53 @@ public class Bullet : MonoBehaviour
                             ObjectPoolManager.ReturnObjectToPool(gameObject);
                         }
                         break;
+                    case "Shield":
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
+                        if (spawnFireBallInCircle)
+                        {
+                            SpawnProjectiles(numberOfSmallFireBall);
+                        }
+                        ObjectPoolManager.ReturnObjectToPool(gameObject);
+                        break;
                 }
                 break;
             case BulletBelongTo.Player:
                 switch (collision.gameObject.tag)
                 {
                     case "Enemy":
-                        collision.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
+                        if (haveImpactRadius)
+                        {
+                            Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, impactRadius);
+                            Debug.Log(colliders.Length);
+
+                            foreach (Collider2D collider in colliders)
+                            {
+                                if ((collider != null && collider.gameObject != gameObject && collider.CompareTag("Enemy")))
+                                {
+                                    collider.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            collision.gameObject.GetComponent<EnemyTakeDmg>().TakeDamage(damage);
+                        }
+                        TopDownPlayerMovement.instance.damageDeal += damage;
                         ObjectPoolManager.ReturnObjectToPool(gameObject);
                         break;
 
                     case "Ground/Wall":
+                        if (useImpactEffect)
+                        {
+                            ObjectPoolManager.SpawnObject(impactEffect, transform.position, Quaternion.identity, ObjectPoolManager.PoolType.ParticleSystem);
+                        }
                         if (canBounce)
                         {
                             currentBounceTime++;

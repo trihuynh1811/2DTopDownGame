@@ -10,7 +10,7 @@ public class BossAttack : MonoBehaviour
         MechaGolem,
         Death
     }
-    [SerializeField] Boss bossType;
+    public Boss bossType;
 
     [SerializeField] EnemyTakeDmg enemyTakeDmg;
 
@@ -44,7 +44,7 @@ public class BossAttack : MonoBehaviour
     [SerializeField] AnimationClip disappearClip, attack_2, attack_3;
     [SerializeField] SpriteMask deathMask;
     [SerializeField] float attackRate, blackHoleRotateSpeed, disappearRate, appearRate, shootRate, splashSpeed;
-    [SerializeField] GameObject blackHole, leftEyeTrail, rightEyeTrail, splash, shootPointListObject;
+    public GameObject blackHole, leftEyeTrail, rightEyeTrail, splash, shootPointListObject;
     float currentAttackRate, currentDisappearRate, currentAppearRate, currentSpeed, currentShootRate, currentTransformRotateSpeed;
     bool disappear;
 
@@ -64,8 +64,11 @@ public class BossAttack : MonoBehaviour
         currentRotateTime = Random.Range(minRotateTime, maxRotateTime);
         currentRandomLaserTime = randomLaserTime;
         currentDisappearRate = disappearRate;
-        currentSpeed = enemyChasePlayerTest.speed;
-        currentTransformRotateSpeed = enemyChasePlayerTest.transformRotationSpeed;
+        if (bossType == Boss.Death)
+        {
+            currentSpeed = enemyChasePlayerTest.speed;
+            currentTransformRotateSpeed = enemyChasePlayerTest.transformRotationSpeed;
+        }
         foreach (GameObject laser in lasers)
         {
             laser.SetActive(false);
@@ -95,10 +98,7 @@ public class BossAttack : MonoBehaviour
                 break;
             case Boss.Crab:
                 RotateGunTowardPlayer();
-                if (currentFireRate <= 0)
-                {
-                    ShootPlayer();
-                }
+                ShootPlayer();
                 if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
             case Boss.Death:
@@ -199,18 +199,22 @@ public class BossAttack : MonoBehaviour
     {
         if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 75) / 100) && enemyTakeDmg.health <= enemyTakeDmg.maxHealth)
         {
-            currentFireRate = fireRate;
-            for (int i = 0; i < numberOfBullet; i++)
+            if (currentFireRate <= 0)
             {
-                spread = Random.Range(-spreadAngle, spreadAngle);
-                currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
-                Vector2 direction = Quaternion.Euler(0, 0, spread) * firePoint.right;
-                //GameObject bulletClone = Instantiate(bullet, firePoint.position, firePoint.rotation);
-                GameObject bulletClone = ObjectPoolManager.SpawnObject(bullet, firePoint.position, firePoint.rotation, ObjectPoolManager.PoolType.GameObject);
-                bulletClone.GetComponent<Bullet>().SetDmg(bulletDamage);
-                bulletClone.transform.right = direction.normalized;
-                bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
+                for (int i = 0; i < numberOfBullet; i++)
+                {
+                    spread = Random.Range(-spreadAngle, spreadAngle);
+                    currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
+                    Vector2 direction = Quaternion.Euler(0, 0, spread) * firePoint.right;
+                    //GameObject bulletClone = Instantiate(bullet, firePoint.position, firePoint.rotation);
+                    GameObject bulletClone = ObjectPoolManager.SpawnObject(bullet, firePoint.position, firePoint.rotation, ObjectPoolManager.PoolType.GameObject);
+                    bulletClone.GetComponent<Bullet>().SetDmg(bulletDamage);
+                    bulletClone.transform.right = direction.normalized;
+                    bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
+                }
+                currentFireRate = fireRate;
             }
+
         }
         else
         {
@@ -224,7 +228,6 @@ public class BossAttack : MonoBehaviour
                 }
                 if (currentFireRate <= 0)
                 {
-                    Debug.Log("deal damage to player");
                     flameDetectPlayer.damge = flameDamage;
                     flameDetectPlayer.damageRate = currentFireRate;
                     currentFireRate = flameFireRate;
@@ -236,17 +239,18 @@ public class BossAttack : MonoBehaviour
                     flameDetectPlayer.damageRate = flameFireRate;
                 }
             }
-            if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100))
+            if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health > 0)
             {
                 missleLauncher.SetActive(true);
 
-                int numberMissile = Random.Range(minNumberMissle, maxNumberMissle);
-                Debug.Log(numberMissile);
                 if (currentFireRate <= 0)
                 {
+                    int numberMissile = Random.Range(minNumberMissle, maxNumberMissle);
+                    Debug.Log(numberMissile);
+
                     for (int i = 0; i < numberMissile; i++)
                     {
-                        Vector2 missleIndicatorPos = new Vector2(Random.Range(minXpos, maxXpos), Random.Range(minYpos, maxYpos));
+                        Vector2 missleIndicatorPos = new(Random.Range(minXpos, maxXpos + .1f), Random.Range(minYpos, maxYpos + .1f));
                         //Vector2 missleIndicatorPos = (Vector2)player.position + new Vector2(Random.Range(minXpos, maxXpos), Random.Range(minYpos, maxYpos));
                         //missleIndicatorPos.x = missleIndicatorPos.x > maxXpos ? maxXpos : missleIndicatorPos.x < minXpos ? minXpos : missleIndicatorPos.x;
                         //missleIndicatorPos.y = missleIndicatorPos.y > maxYpos ? maxYpos : missleIndicatorPos.y < minYpos ? minYpos : missleIndicatorPos.y;
@@ -272,7 +276,7 @@ public class BossAttack : MonoBehaviour
             RotateRing();
 
         }
-        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100))
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health > 0)
         {
             drone.ForEach(d => d.SetActive(false));
             if (currentRandomLaserTime > 0)
@@ -300,7 +304,7 @@ public class BossAttack : MonoBehaviour
             //blackHole.transform.Rotate(0, 0, blackHoleRotateSpeed * Time.deltaTime);
 
         }
-        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100))
+        if (enemyTakeDmg.health >= ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 50) / 100) || enemyTakeDmg.health < ((enemyTakeDmg.maxHealth * 25) / 100) && enemyTakeDmg.health > 0)
         {
             Time.timeScale = 1.0f;
             enemyChasePlayerTest.rb.drag = 3;
@@ -345,6 +349,7 @@ public class BossAttack : MonoBehaviour
             animator.Rebind();
             transform.position = (Vector2)player.transform.position + new Vector2(Random.Range(-7, 7), 0);
             Time.timeScale = .5f;
+            enemyTakeDmg.healtCanvas.SetActive(true);
             animator.Play(attack_2.name);
         }
         disappear = false;
@@ -359,6 +364,7 @@ public class BossAttack : MonoBehaviour
         enemyChasePlayerTest.speed = currentSpeed;
         enemyChasePlayerTest.transformRotationSpeed = currentTransformRotateSpeed;
         shootPointListObject.SetActive(false);
+        enemyTakeDmg.healtCanvas.SetActive(false);
         yield return new WaitForSeconds(appearRate);
     }
 

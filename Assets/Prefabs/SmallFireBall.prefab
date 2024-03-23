@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6046594764667997034}
   - component: {fileID: 1567364817122719412}
   - component: {fileID: -6471964638624825159}
-  m_Layer: 8
+  m_Layer: 12
   m_Name: SmallFireBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -165,6 +165,10 @@ MonoBehaviour:
   rb: {fileID: 4047663131747428937, guid: 9f80f564362ebb4438ac5e69d384e5a9, type: 3}
   maxBounceTime: 0
   maxExistTime: 10
+  useImpactEffect: 0
+  haveImpactRadius: 0
+  impactEffect: {fileID: 0}
+  impactRadius: 0
   spawnFireBallInCircle: 0
   smallFireBall: {fileID: 0}
   numberOfSmallFireBall: 0
@@ -172,3 +176,4 @@ MonoBehaviour:
   smallFireBallSpeed: 0
   spread: 0
   radius: 0
+  canBounce: 0

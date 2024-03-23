@@ -8,10 +8,10 @@ using System.Linq;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    [SerializeField] Text timerText;
+    public Text timerText;
     [SerializeField] TextMeshProUGUI refreshItemPriceText, LockItemText, lockText, waveCountDownText, waveNumberText;
     [HideInInspector] public int time;
-    [SerializeField] GameObject triggerNewWaveObject, refreshItemCanvas, lockItemCanvas, waveCanvas;
+    public GameObject triggerNewWaveObject, refreshItemCanvas, lockItemCanvas, waveCanvas;
     [SerializeField] int refreshItemPrice;
     [SerializeField] Transform spawnedItemPos, bossSpawnPos;
 
@@ -21,9 +21,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] List<Vector2> minXYPos;
     [SerializeField] float spawnRate;
     [SerializeField] int numberOfMonsterPerSpawn, maxTime, maxWave, minSurvivalTime, maxSurvivalTime;
+    [SerializeField] List<int> bossWaveMaxTime = new List<int> { 45, 60, 90 };
     [SerializeField] List<GameObject> monsterList;
     List<GameObject> currentMonsterList;
     public int listIndex, numberOfMonster;
+    bool assignNewMonsterList;
     [SerializeField] GameObject spawnIndicator;
 
     [SerializeField] List<Transform> itemsPosList;
@@ -36,7 +38,9 @@ public class GameManager : MonoBehaviour
     int randomNumberOfMonsterToSpawn, wave = 1, numberOfRefreshTime = 1;
     public int currentRefreshItemPrice { get; set; }
     Vector2 newSpawnPoint;
-    bool timerRunning = true, newWaveStart, allStatsDisabled;
+    public bool timerRunning { get; set; } = true;
+    public bool newWaveStart { get; set; }
+    public bool allStatsDisabled { get; set; }
     public static List<GameObject> spawnedMonsterList = new List<GameObject>();
     public static List<GameObject> itemList = new List<GameObject>();
     public List<BoxCollider2D> boxCollider2dList = new List<BoxCollider2D>();
@@ -45,6 +49,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> lockList;
     public static bool endOfWave;
     public static bool itemsLocked;
+    int priceMultiplier = 1;
 
     private void Awake()
     {
@@ -67,7 +72,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        time = maxTime;
+        time = Random.Range(minSurvivalTime, maxSurvivalTime);
         timerText.text = time.ToString();
         triggerNewWaveObject.SetActive(false);
         refreshItemCanvas.SetActive(false);
@@ -96,10 +101,12 @@ public class GameManager : MonoBehaviour
     void Spawn()
     {
         currentSpawnRate = spawnRate;
-        if (wave % 4 == 0 && wave < 15)
+        if (wave % 4 == 0 && wave < 15 && !assignNewMonsterList)
         {
             numberOfMonster = numberOfMonster < monsterList.Count - 1 ? numberOfMonster + 1 : monsterList.Count - 1;
-            currentMonsterList = monsterList.GetRange(listIndex, numberOfMonster);
+            currentMonsterList = monsterList.GetRange(listIndex, numberOfMonster).ToList();
+            assignNewMonsterList = true;
+
         }
         if (wave == 13)
         {
@@ -128,8 +135,6 @@ public class GameManager : MonoBehaviour
     {
         currentWaveCountDown = 3;
         numberOfRefreshTime = 1;
-        time = maxTime;
-        timerText.text = time.ToString();
         newWaveStart = false;
         endOfWave = false;
         itemsLocked = false;
@@ -145,6 +150,7 @@ public class GameManager : MonoBehaviour
         itemPosObject.SetActive(false);
         spawnedMonsterList.Clear();
         itemList.Clear();
+        spawnedItems.Clear();
         triggerNewWaveObject.SetActive(false);
 
         StartCoroutine(BeginNewWave());
@@ -168,6 +174,11 @@ public class GameManager : MonoBehaviour
                 timerRunning = false;
                 triggerNewWaveObject.SetActive(true);
                 endOfWave = true;
+                if(wave == 15)
+                {
+                    TopDownPlayerMovement.instance.Win();
+                    return;
+                }
                 //if (lockedItemList.Count > 0)
                 //{
                 //    itemsPosList.ForEach(x => x.gameObject.SetActive(false));
@@ -207,9 +218,9 @@ public class GameManager : MonoBehaviour
                     int randomItemIndex = Random.Range(0, currentItemList.Count);
 
                     GameObject item = Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
-                    itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price;
+                    itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price * priceMultiplier;
                     itemsPosList[i].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
-                    itemsPosList[i].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
+                    itemsPosList[i].GetComponent<Item>().itemPriceText.text = (item.GetComponent<ItemStat>().price * priceMultiplier).ToString();
                     itemsPosList[i].GetComponent<Item>().item = item.gameObject;
                     currentItemList.RemoveAt(randomItemIndex);
                     item.transform.parent = spawnedItemPos;
@@ -250,8 +261,20 @@ public class GameManager : MonoBehaviour
             minSpawnX = minXYPos[index].x;
             minSpawnY = minXYPos[index].y;
             Instantiate(bosses[index], bossSpawnPos.position, Quaternion.identity);
+            time = bossWaveMaxTime[index];
+            priceMultiplier *= 3;
         }
+        else
+        {
+            time = Random.Range(minSurvivalTime, maxSurvivalTime);
+        }
+        if (wave % 4 == 0)
+        {
+            assignNewMonsterList = false;
+        }
+        timerText.text = time.ToString();
         timerRunning = true;
+
     }
 
     public void DisableStats()
@@ -274,9 +297,9 @@ public class GameManager : MonoBehaviour
             int randomItemIndex = Random.Range(0, currentItemList.Count);
 
             GameObject item = Instantiate(currentItemList[randomItemIndex], itemsPosList[i].transform.position, Quaternion.identity);
-            itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price;
+            itemsPosList[i].GetComponent<Item>().price = item.GetComponent<ItemStat>().price * numberOfRefreshTime * priceMultiplier;
             itemsPosList[i].GetComponent<Item>().itemNameText.text = item.GetComponent<ItemStat>().itemName;
-            itemsPosList[i].GetComponent<Item>().itemPriceText.text = item.GetComponent<ItemStat>().price.ToString();
+            itemsPosList[i].GetComponent<Item>().itemPriceText.text = (item.GetComponent<ItemStat>().price * numberOfRefreshTime * priceMultiplier).ToString();
             itemsPosList[i].GetComponent<Item>().item = item.gameObject;
             currentItemList.RemoveAt(randomItemIndex);
             item.transform.parent = spawnedItemPos;

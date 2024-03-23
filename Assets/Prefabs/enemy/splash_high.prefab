@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2474725971749906440}
   - component: {fileID: 1102918728773517366}
   - component: {fileID: -1051723807188455188}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: splash_high
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,6 +187,10 @@ MonoBehaviour:
   rb: {fileID: 1102918728773517366}
   maxBounceTime: 0
   maxExistTime: 10
+  useImpactEffect: 0
+  haveImpactRadius: 0
+  impactEffect: {fileID: 0}
+  impactRadius: 0
   spawnFireBallInCircle: 0
   smallFireBall: {fileID: 0}
   numberOfSmallFireBall: 0
@@ -194,3 +198,4 @@ MonoBehaviour:
   smallFireBallSpeed: 0
   spread: 0
   radius: 0
+  canBounce: 0

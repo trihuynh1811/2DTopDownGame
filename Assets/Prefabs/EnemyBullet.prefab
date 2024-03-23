@@ -101,8 +101,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletBelongTo: 1
   rb: {fileID: 7579465900996561745}
-  maxBounceTime: 10
-  maxExistTime: 100
+  maxBounceTime: 0
+  maxExistTime: 10
+  useImpactEffect: 0
+  impactEffect: {fileID: 0}
   spawnFireBallInCircle: 0
   smallFireBall: {fileID: 0}
   numberOfSmallFireBall: 0
@@ -110,7 +112,7 @@ MonoBehaviour:
   smallFireBallSpeed: 0
   spread: 0
   radius: 0
-  canBounce: 1
+  canBounce: 0
 --- !u!58 &5099118378154174048
 CircleCollider2D:
   m_ObjectHideFlags: 0

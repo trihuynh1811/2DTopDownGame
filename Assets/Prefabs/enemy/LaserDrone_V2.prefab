@@ -409,8 +409,10 @@ MonoBehaviour:
   player: {fileID: 0}
   useDeadEffect: 1
   deathEffect: {fileID: 1000011128802252, guid: 96730f8640590934eacb6f860058e7f9, type: 3}
+  useAttackAnimation: 0
   animator: {fileID: 0}
   deathClip: {fileID: 0}
+  attackClip: {fileID: 0}
   explosionDmg: 5
   explosionForce: 15
   explosionTime: 0.3
@@ -430,11 +432,14 @@ MonoBehaviour:
   laserExistTime: 0.2
   laserHitMask:
     serializedVersion: 2
-    m_Bits: 1096
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8264
   laserEnd: {fileID: 2129384480372840932}
+  bullet: {fileID: 0}
+  numberOfBullet: 0
+  bulletSpeed: 0
+  spreadAngle: 0
+  minBulletSpeed: 0
+  maxBulletSpeed: 0
 --- !u!114 &7938912414137237418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,6 +461,9 @@ MonoBehaviour:
   enemySprite: {fileID: 3656684626844710403}
   hurtMat: {fileID: 2100000, guid: d7ec828ad19179945ac97a24a25f74bc, type: 3}
   flashDuration: 0
+  healthCanvasPos: {fileID: 0}
+  healtCanvas: {fileID: 0}
+  healthBar: {fileID: 0}
 --- !u!1 &5019162054694194156
 GameObject:
   m_ObjectHideFlags: 0

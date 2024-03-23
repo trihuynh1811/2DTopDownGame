@@ -77,6 +77,18 @@ public class YourScriptEditor : Editor
     SerializedProperty movementSpeedText;
     SerializedProperty numberOfBulletText;
 
+    SerializedProperty winLoseCanvas;
+    SerializedProperty winCanvas;
+    SerializedProperty loseCanvas;
+    SerializedProperty dieCanvas;
+    SerializedProperty reviveCoin;
+    SerializedProperty deadTime;
+    SerializedProperty monsterKill;
+    SerializedProperty damageDeal;
+    SerializedProperty reviveCoinText;
+    SerializedProperty monsterKillText;
+    SerializedProperty damageDealText;
+
     bool showGeneralSetting, showUiSetting = false, showBuffStatUiSetting = false;
 
     private void OnEnable()
@@ -153,6 +165,18 @@ public class YourScriptEditor : Editor
         weaponAccuracyText = serializedObject.FindProperty("weaponAccuracyText");
         movementSpeedText = serializedObject.FindProperty("movementSpeedText");
         numberOfBulletText = serializedObject.FindProperty("numberOfBulletText");
+
+        winLoseCanvas = serializedObject.FindProperty("winLoseCanvas");
+        winCanvas = serializedObject.FindProperty("winCanvas");
+        loseCanvas = serializedObject.FindProperty("loseCanvas");
+        dieCanvas = serializedObject.FindProperty("dieCanvas");
+        reviveCoin = serializedObject.FindProperty("reviveCoin");
+        deadTime = serializedObject.FindProperty("deadTime");
+        monsterKill = serializedObject.FindProperty("monsterKill");
+        damageDeal = serializedObject.FindProperty("damageDeal");
+        reviveCoinText = serializedObject.FindProperty("reviveCoinText");
+        monsterKillText = serializedObject.FindProperty("monsterKillText");
+        damageDealText = serializedObject.FindProperty("damageDealText");
 
 
     }
@@ -248,6 +272,17 @@ public class YourScriptEditor : Editor
         EditorGUILayout.PropertyField(armourText);
         EditorGUILayout.PropertyField(energyText);
         EditorGUILayout.PropertyField(coinText);
+        EditorGUILayout.PropertyField(winLoseCanvas);
+        EditorGUILayout.PropertyField(winCanvas);
+        EditorGUILayout.PropertyField(loseCanvas);
+        EditorGUILayout.PropertyField(dieCanvas);
+        EditorGUILayout.PropertyField(reviveCoin);
+        EditorGUILayout.PropertyField(deadTime);
+        EditorGUILayout.PropertyField(monsterKill);
+        EditorGUILayout.PropertyField(damageDeal);
+        EditorGUILayout.PropertyField(reviveCoinText);
+        EditorGUILayout.PropertyField(monsterKillText);
+        EditorGUILayout.PropertyField(damageDealText);
 
 
     }

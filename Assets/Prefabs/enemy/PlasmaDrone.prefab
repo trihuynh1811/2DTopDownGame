@@ -230,7 +230,7 @@ MonoBehaviour:
   firePointList: []
   firePoint: {fileID: 8225413364014763775}
   fireRate: 0.55
-  damage: 10
+  damage: 5
   flameParticleList: []
   flameRaycastLength: 0
   gunRotationSpeed: 0
@@ -270,6 +270,9 @@ MonoBehaviour:
   enemySprite: {fileID: 1117684928997471034}
   hurtMat: {fileID: 2100000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
   flashDuration: 0
+  healthCanvasPos: {fileID: 0}
+  healtCanvas: {fileID: 0}
+  healthBar: {fileID: 0}
 --- !u!1 &8009169452260845544
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8731473280157586273}
   - component: {fileID: 4047663131747428937}
   - component: {fileID: 711474557957659465}
-  m_Layer: 8
+  m_Layer: 12
   m_Name: FireBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.15
+  m_Radius: 0.18
 --- !u!50 &4047663131747428937
 Rigidbody2D:
   serializedVersion: 4
@@ -165,10 +165,15 @@ MonoBehaviour:
   rb: {fileID: 4047663131747428937}
   maxBounceTime: 0
   maxExistTime: 10
+  useImpactEffect: 0
+  haveImpactRadius: 0
+  impactEffect: {fileID: 0}
+  impactRadius: 0
   spawnFireBallInCircle: 1
   smallFireBall: {fileID: 64766853829323051, guid: 598fbd8917cf7d34fb01563d73c441e3, type: 3}
   numberOfSmallFireBall: 50
   smallFireBallDmg: 5
-  smallFireBallSpeed: 700
+  smallFireBallSpeed: 850
   spread: 0
   radius: 5
+  canBounce: 0

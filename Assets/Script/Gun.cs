@@ -9,7 +9,8 @@ public class Gun : MonoBehaviour
     {
         NormalGun,
         Flamethrower,
-        LaserGun
+        LaserGun,
+        RocketLauncher
     }
     public GunType gunType;
     // Variable for flamethrower
@@ -34,6 +35,8 @@ public class Gun : MonoBehaviour
     [SerializeField] float fireRate;
     [SerializeField] float spreadAngle;
     [SerializeField] int numberOfBullet;
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip gunSound;
     [SerializeField] bool isShotGun;
     float currentFireRate;
     float spread;
@@ -91,14 +94,21 @@ public class Gun : MonoBehaviour
         switch (gunType)
         {
             case GunType.NormalGun:
-                if (Input.GetButton("Fire1") && currentFireRate <= 0)
+                if (Input.GetButton("Fire1") && currentFireRate <= 0 && TopDownPlayerMovement.instance.energy >= energyConsume)
+                {
+                    Shoot();
+                }
+                if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
+                break;
+            case GunType.RocketLauncher:
+                if (Input.GetButton("Fire1") && currentFireRate <= 0 && TopDownPlayerMovement.instance.energy >= energyConsume)
                 {
                     Shoot();
                 }
                 if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
             case GunType.Flamethrower:
-                if (Input.GetButton("Fire1"))
+                if (Input.GetButton("Fire1") && TopDownPlayerMovement.instance.energy >= energyConsume)
                 {
                     Shoot();
                 }
@@ -112,7 +122,7 @@ public class Gun : MonoBehaviour
                 if (currentFireRate > 0) currentFireRate -= Time.deltaTime;
                 break;
             case GunType.LaserGun:
-                if (Input.GetButton("Fire1"))
+                if (Input.GetButton("Fire1") && TopDownPlayerMovement.instance.energy >= energyConsume)
                 {
                     Shoot();
                 }
@@ -153,6 +163,23 @@ public class Gun : MonoBehaviour
                     bulletClone.GetComponent<Bullet>().SetDmg(currentDamage);
                     bulletClone.transform.right = direction.normalized;
                     bulletClone.GetComponent<Rigidbody2D>().AddForce(direction.normalized * currentBulletSpeed);
+                }
+                break;
+            case GunType.RocketLauncher:
+                if (TopDownPlayerMovement.instance.energy <= 0)
+                {
+                    TopDownPlayerMovement.instance.energy = 0;
+                    TopDownPlayerMovement.instance.UpdateUi();
+                    return;
+                }
+                currentFireRate = fireRate - (fireRate * TopDownPlayerMovement.instance.rateOfFire);
+                for (int i = 0; i < currentNumberOfBullet; i++)
+                {
+                    currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
+                    //GameObject bulletClone = Instantiate(bullet, firePoint.position, firePoint.rotation);
+                    GameObject rocketClone = ObjectPoolManager.SpawnObject(bullet, firePoint.position, firePoint.rotation, ObjectPoolManager.PoolType.GameObject);
+                    rocketClone.GetComponent<Bullet>().SetDmg(currentDamage);
+                    rocketClone.GetComponent<Rigidbody2D>().AddForce(rocketClone.transform.right.normalized * currentBulletSpeed);
                 }
                 break;
             case GunType.Flamethrower:
@@ -214,7 +241,11 @@ public class Gun : MonoBehaviour
                 laser.SetPosition(1, new Vector2(distance, 0));
                 break;
         }
-
+        if (gunSound != null)
+        {
+            audioSource.PlayOneShot(gunSound);
+        }
+        TopDownPlayerMovement.instance.energy -= energyConsume;
 
     }
 
@@ -233,9 +264,13 @@ public class Gun : MonoBehaviour
 
     public void ApplyBuff()
     {
-        if (currentSpreadAngle <= 0)
+        if (currentSpreadAngle <= 0 && !isShotGun)
         {
             currentSpreadAngle = 0.01f;
+        }
+        if(currentSpreadAngle <= 3 && !isShotGun)
+        {
+            currentSpreadAngle = 3f;
         }
 
         if (currentNumberOfBullet != numberOfBullet + TopDownPlayerMovement.instance.numberOfBullet && isShotGun)

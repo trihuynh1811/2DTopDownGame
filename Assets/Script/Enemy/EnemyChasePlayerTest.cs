@@ -36,7 +36,6 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
     private void Awake()
     {
-
     }
 
     private void Start()
@@ -74,6 +73,10 @@ public class EnemyChasePlayerTest : MonoBehaviour
         if (!isDead)
         {
             LookAtPlayer();
+        }
+        if (takeDmg.healtCanvas != null)
+        {
+            takeDmg.HealthCanvasFollow();
         }
     }
 
@@ -211,6 +214,10 @@ public class EnemyChasePlayerTest : MonoBehaviour
 
     void Dead()
     {
+        if(takeDmg.health <= 0)
+        {
+            TopDownPlayerMovement.instance.monsterKill++;
+        }
         if(itemList.Where(x => x.GetComponent<ItemStat>().dropOneTime).Any())
         {
             List<GameObject> oneItemList = itemList.Where(x => x.GetComponent<ItemStat>().dropOneTime).ToList();
@@ -218,7 +225,19 @@ public class EnemyChasePlayerTest : MonoBehaviour
             {
                 Vector2 randomPos = new(transform.position.x + Random.Range(-randomItemPos.x, randomItemPos.x), transform.position.y + Random.Range(-randomItemPos.y, randomItemPos.y));
                 GameObject item = Instantiate(oneItemList[i], randomPos, oneItemList[i].transform.rotation);
+                Debug.Log(itemList.RemoveAll(item => item.GetComponent<ItemStat>().dropOneTime));
             }
+        }
+        if (bossAttack != null && bossAttack.bossType == BossAttack.Boss.Death)
+        {
+            bossAttack.leftEyeTrail.SetActive(false);
+            bossAttack.rightEyeTrail.SetActive(false);
+            GameManager.instance.time = 0;
+            GameManager.instance.timerText.text = GameManager.instance.time.ToString();
+            GameManager.instance.timerRunning = false;
+            GameManager.instance.triggerNewWaveObject.SetActive(false);
+            GameManager.endOfWave = true;
+            TopDownPlayerMovement.instance.Win();
         }
         if (animator != null)
         {
@@ -249,6 +268,19 @@ public class EnemyChasePlayerTest : MonoBehaviour
                 GameManager.itemList.Add(item);
             }
         }
+        if(bossAttack != null)
+        {
+            bossAttack.enabled = false;
+        }
+        if(enemyAttack != null)
+        {
+            enemyAttack.enabled = false;
+        }
+        if(takeDmg.healtCanvas != null)
+        {
+            takeDmg.healtCanvas.SetActive(false);
+        }
+
         c2d.enabled = false;
         rb.freezeRotation = true;
         this.enabled = false;
